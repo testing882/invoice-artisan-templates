@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,9 +15,11 @@ const Dashboard: React.FC = () => {
   const { templates } = useTemplates();
   const navigate = useNavigate();
   
-  const recentInvoices = invoices.slice(0, 5);
+  const activeInvoices = invoices.filter(invoice => !invoice.deleted);
   
-  const totalInvoiceAmount = invoices.reduce((sum, invoice) => {
+  const recentInvoices = activeInvoices.slice(0, 5);
+  
+  const totalInvoiceAmount = activeInvoices.reduce((sum, invoice) => {
     const totalWithTax = invoice.totalAmount + (invoice.taxAmount || 0);
     return sum + totalWithTax;
   }, 0);
@@ -42,7 +43,7 @@ const Dashboard: React.FC = () => {
             <CardTitle className="text-invoice-gray">Total Invoices</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">{invoices.length}</p>
+            <p className="text-3xl font-bold">{activeInvoices.length}</p>
           </CardContent>
         </Card>
         
@@ -65,14 +66,12 @@ const Dashboard: React.FC = () => {
         </Card>
       </div>
       
-      {/* Monthly Invoice Chart - Full Width */}
       <div className="grid grid-cols-1 gap-6">
-        <MonthlyInvoiceChart invoices={invoices} />
+        <MonthlyInvoiceChart invoices={activeInvoices} />
       </div>
       
-      {/* Top Customers Chart */}
       <div className="grid grid-cols-1 gap-6">
-        <TopCustomersChart invoices={invoices} />
+        <TopCustomersChart invoices={activeInvoices} />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

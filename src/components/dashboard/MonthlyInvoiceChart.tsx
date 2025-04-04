@@ -35,7 +35,10 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
       });
     }
     
-    invoices.forEach(invoice => {
+    // Filter out deleted invoices before calculating revenue
+    const activeInvoices = invoices.filter(invoice => !invoice.deleted);
+    
+    activeInvoices.forEach(invoice => {
       if (!isValid(invoice.date)) return;
       
       if (getYear(invoice.date) !== currentYear) return;
