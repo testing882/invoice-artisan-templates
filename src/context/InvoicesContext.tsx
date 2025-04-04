@@ -1,89 +1,25 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
 import { Invoice } from '@/types/invoice';
-import { toast } from 'sonner';
-import { STORAGE_KEYS } from './types';
-import { useTemplates } from './TemplatesContext';
+import { useInvoicesData } from '@/hooks/useInvoicesData';
 
 interface InvoicesContextType {
   invoices: Invoice[];
-  addInvoice: (invoice: Invoice) => void;
-  updateInvoice: (invoice: Invoice) => void;
-  deleteInvoice: (id: string) => void;
+  addInvoice: (invoice: Invoice) => Promise<void>;
+  updateInvoice: (invoice: Invoice) => Promise<void>;
+  deleteInvoice: (id: string) => Promise<void>;
   getInvoiceById: (id: string) => Invoice | undefined;
+  loading: boolean;
+  error: string | null;
 }
 
 const InvoicesContext = createContext<InvoicesContextType | undefined>(undefined);
 
 export const InvoicesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [initialized, setInitialized] = useState(false);
-
-  // Load saved invoices from localStorage on initial render
-  useEffect(() => {
-    try {
-      console.log('Loading invoices from localStorage');
-      const savedInvoices = localStorage.getItem(STORAGE_KEYS.INVOICES_STORAGE_KEY);
-      
-      if (savedInvoices) {
-        const parsedInvoices = JSON.parse(savedInvoices);
-        // Convert string dates back to Date objects
-        const processedInvoices = parsedInvoices.map((invoice: any) => ({
-          ...invoice,
-          date: new Date(invoice.date),
-          dueDate: new Date(invoice.dueDate),
-        }));
-        setInvoices(processedInvoices);
-      }
-      setInitialized(true);
-    } catch (error) {
-      console.error('Error loading saved invoices:', error);
-      toast.error('Failed to load saved invoices');
-      setInitialized(true);
-    }
-  }, []);
-
-  // Save to localStorage whenever invoices change
-  useEffect(() => {
-    if (!initialized) return;
-    
-    try {
-      localStorage.setItem(STORAGE_KEYS.INVOICES_STORAGE_KEY, JSON.stringify(invoices));
-    } catch (error) {
-      console.error('Error saving invoices:', error);
-      toast.error('Failed to save invoices');
-    }
-  }, [invoices, initialized]);
-
-  const addInvoice = (invoice: Invoice) => {
-    setInvoices((prev) => [...prev, invoice]);
-    toast.success('Invoice created successfully');
-  };
-
-  const updateInvoice = (invoice: Invoice) => {
-    setInvoices((prev) => prev.map((inv) => (inv.id === invoice.id ? invoice : inv)));
-    toast.success('Invoice updated successfully');
-  };
-
-  const deleteInvoice = (id: string) => {
-    setInvoices((prev) => prev.filter((invoice) => invoice.id !== id));
-    toast.success('Invoice deleted successfully');
-  };
-
-  const getInvoiceById = (id: string) => {
-    return invoices.find((invoice) => invoice.id === id);
-  };
+  const invoicesData = useInvoicesData();
 
   return (
-    <InvoicesContext.Provider
-      value={{
-        invoices,
-        addInvoice,
-        updateInvoice,
-        deleteInvoice,
-        getInvoiceById,
-      }}
-    >
+    <InvoicesContext.Provider value={invoicesData}>
       {children}
     </InvoicesContext.Provider>
   );

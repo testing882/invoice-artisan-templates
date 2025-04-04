@@ -9,6 +9,7 @@ export const fetchTemplates = async (): Promise<CompanyTemplate[]> => {
   try {
     // Get current user ID
     const userId = await getCurrentUserId();
+    console.log('Current user ID:', userId);
     
     if (!userId) {
       console.log('No authenticated user, returning empty templates array');
@@ -16,20 +17,24 @@ export const fetchTemplates = async (): Promise<CompanyTemplate[]> => {
     }
     
     // Fetch templates for the current user
+    console.log('Fetching templates for user:', userId);
     const { data, error } = await supabase
       .from('templates')
       .select('*')
       .eq('user_id', userId);
     
     if (error) {
+      console.error('Supabase error when fetching templates:', error);
       throw error;
     }
     
-    console.log('Fetched templates:', data);
+    console.log('Fetched templates data:', data);
     
     if (data && data.length > 0) {
       // Map templates from Supabase format to application format
-      return data.map(mapTemplateFromSupabase);
+      const mappedTemplates = data.map(mapTemplateFromSupabase);
+      console.log('Mapped templates:', mappedTemplates);
+      return mappedTemplates;
     } else {
       // Return empty array if no templates found
       console.log('No templates found, returning empty array');

@@ -17,8 +17,10 @@ export const useTemplatesData = () => {
   useEffect(() => {
     const loadTemplates = async () => {
       try {
+        console.log('Loading templates in useTemplatesData...');
         setLoading(true);
         const data = await fetchTemplates();
+        console.log('Templates loaded in useTemplatesData:', data);
         setTemplates(data);
         setError(null);
       } catch (err) {
