@@ -31,7 +31,7 @@ export const mapInvoiceFromSupabase = (invoice: SupabaseInvoice): Invoice => ({
   client: invoice.client as any,
   items: invoice.items as any,
   notes: invoice.notes || '',
-  status: invoice.status,
+  status: invoice.status as 'draft' | 'sent' | 'paid',
   date: new Date(invoice.date),
   dueDate: new Date(invoice.due_date),
   totalAmount: Number(invoice.total_amount),

@@ -30,7 +30,7 @@ export const fetchInvoices = async (): Promise<Invoice[]> => {
     
     if (data && data.length > 0) {
       // Map invoices from Supabase format to application format
-      return data.map(mapInvoiceFromSupabase);
+      return data.map(invoice => mapInvoiceFromSupabase(invoice as any));
     } else {
       // Return empty array if no invoices found
       console.log('No invoices found, returning empty array');
@@ -65,7 +65,7 @@ export const addInvoiceToDatabase = async (invoice: Invoice): Promise<void> => {
       .insert({
         ...supabaseInvoice,
         user_id: userId
-      });
+      } as any);
     
     if (error) {
       throw error;
@@ -99,7 +99,7 @@ export const updateInvoiceInDatabase = async (invoice: Invoice): Promise<void> =
       .update({
         ...supabaseInvoice,
         user_id: userId
-      })
+      } as any)
       .eq('id', invoice.id);
     
     if (error) {
