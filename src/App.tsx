@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { InvoiceProvider as InvoicesProvider } from './context/InvoiceContext';
 import { TemplatesProvider } from './context/TemplatesContext';
 import { AuthProvider } from './context/AuthContext';
@@ -39,7 +39,11 @@ const App = () => (
                 
                 {/* Protected routes */}
                 <Route element={<ProtectedRoute />}>
-                  <Route element={<MainLayout />}>
+                  <Route element={
+                    <MainLayout>
+                      <Outlet />
+                    </MainLayout>
+                  }>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/templates" element={<Templates />} />
                     <Route path="/templates/:id" element={<TemplateEditor />} />
