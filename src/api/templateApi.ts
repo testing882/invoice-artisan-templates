@@ -4,46 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { mapTemplateFromSupabase, mapTemplateToSupabase, getCurrentUserId } from '@/lib/supabase';
 import { toast } from 'sonner';
 
-// Sample template data (fallback if database is empty)
-export const sampleTemplates: CompanyTemplate[] = [
-  {
-    id: '1',
-    name: 'Acme Inc',
-    address: '123 Business St',
-    city: 'Techville',
-    postalCode: '12345',
-    country: 'USA',
-    phone: '(555) 123-4567',
-    email: 'billing@acmeinc.com',
-    taxId: 'US12345678',
-    isEU: false,
-  },
-  {
-    id: '2',
-    name: 'TechCorp',
-    address: '456 Innovation Ave',
-    city: 'Silicon Valley',
-    postalCode: '94043',
-    country: 'USA',
-    phone: '(555) 987-6543',
-    email: 'accounts@techcorp.com',
-    taxId: 'US98765432',
-    isEU: false,
-  },
-  {
-    id: '3',
-    name: 'EuroSoft GmbH',
-    address: '789 Hauptstrasse',
-    city: 'Berlin',
-    postalCode: '10115',
-    country: 'Germany',
-    phone: '+49 30 12345678',
-    email: 'billing@eurosoft.de',
-    taxId: 'DE123456789',
-    isEU: true,
-  }
-];
-
 // Function to fetch templates from Supabase
 export const fetchTemplates = async (): Promise<CompanyTemplate[]> => {
   try {
@@ -51,8 +11,8 @@ export const fetchTemplates = async (): Promise<CompanyTemplate[]> => {
     const userId = await getCurrentUserId();
     
     if (!userId) {
-      console.log('No authenticated user, using sample templates');
-      return sampleTemplates;
+      console.log('No authenticated user, returning empty templates array');
+      return [];
     }
     
     // Fetch templates for the current user
@@ -71,41 +31,16 @@ export const fetchTemplates = async (): Promise<CompanyTemplate[]> => {
       // Map templates from Supabase format to application format
       return data.map(mapTemplateFromSupabase);
     } else {
-      // If no templates found, initialize with sample templates
-      // Only do this on first load for new users
-      console.log('No templates found, initializing with samples');
-      
-      // For new users, add sample templates to Supabase
-      if (userId) {
-        for (const template of sampleTemplates) {
-          const supabaseTemplate = mapTemplateToSupabase(template);
-          await supabase
-            .from('templates')
-            .insert({
-              ...supabaseTemplate,
-              user_id: userId
-            });
-        }
-        
-        // Fetch templates again after inserting samples
-        const { data: refreshedData } = await supabase
-          .from('templates')
-          .select('*')
-          .eq('user_id', userId);
-          
-        if (refreshedData && refreshedData.length > 0) {
-          return refreshedData.map(mapTemplateFromSupabase);
-        }
-      }
-      
-      return sampleTemplates;
+      // Return empty array if no templates found
+      console.log('No templates found, returning empty array');
+      return [];
     }
   } catch (err) {
     console.error('Error loading templates:', err);
     toast.error('Failed to load templates');
     
-    // Fallback to sample data if there's an error
-    return sampleTemplates;
+    // Return empty array in case of error
+    return [];
   }
 };
 
@@ -183,19 +118,11 @@ export const deleteTemplateFromDatabase = async (id: string): Promise<void> => {
   try {
     const userId = await getCurrentUserId();
     
-    // Check if this is a sample template (using simple numeric IDs)
-    const isSampleTemplate = sampleTemplates.some(template => template.id === id);
-    
-    if (!userId || isSampleTemplate) {
-      // For sample templates or when not logged in, just pretend we deleted it
-      // This avoids the UUID validation error from Supabase
-      console.log('Simulating deletion for sample template or no authenticated user');
-      toast.success('Template deleted successfully');
+    if (!userId) {
+      toast.error('You must be logged in to delete templates');
       return;
     }
     
-    // Only try to delete from database if it's not a sample template
-    // and the user is authenticated
     const { error } = await supabase
       .from('templates')
       .delete()
