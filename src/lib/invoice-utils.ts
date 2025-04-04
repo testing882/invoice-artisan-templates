@@ -98,11 +98,17 @@ export const exportToPdf = (invoice: Invoice): void => {
   doc.text(`Subtotal:`, 140, finalY + 10);
   doc.text(`${formatCurrency(invoice.totalAmount)}`, 170, finalY + 10, { align: 'right' });
   
+  doc.text(`Amount Paid:`, 140, finalY + 17);
+  doc.text(`${formatCurrency(invoice.totalAmount)}`, 170, finalY + 17, { align: 'right' });
+  
   if (invoice.taxRate && invoice.taxAmount) {
-    doc.text(`Tax (${invoice.taxRate}%):`, 140, finalY + 17);
-    doc.text(`${formatCurrency(invoice.taxAmount)}`, 170, finalY + 17, { align: 'right' });
+    doc.text(`Tax (${invoice.taxRate}%):`, 140, finalY + 24);
+    doc.text(`${formatCurrency(invoice.taxAmount)}`, 170, finalY + 24, { align: 'right' });
+    doc.text(`Total:`, 140, finalY + 31);
+    doc.text(`${formatCurrency(invoice.totalAmount + invoice.taxAmount)}`, 170, finalY + 31, { align: 'right' });
+  } else {
     doc.text(`Total:`, 140, finalY + 24);
-    doc.text(`${formatCurrency(invoice.totalAmount + invoice.taxAmount)}`, 170, finalY + 24, { align: 'right' });
+    doc.text(`${formatCurrency(invoice.totalAmount)}`, 170, finalY + 24, { align: 'right' });
   }
   
   // Add notes
