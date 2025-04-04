@@ -119,7 +119,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               // Manually calculate and update amount when quantity changes
                               const quantity = parseFloat(e.target.value) || 0;
                               const rate = parseFloat(form.getValues(`items.${index}.rate`)) || 0;
-                              form.setValue(`items.${index}.amount`, quantity * rate);
+                              // Convert number to the correct type for the setValue function
+                              form.setValue(`items.${index}.amount`, quantity * rate as any);
                             }}
                           />
                         </FormControl>
@@ -145,7 +146,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               // Manually calculate and update amount when rate changes
                               const rate = parseFloat(e.target.value) || 0;
                               const quantity = parseFloat(form.getValues(`items.${index}.quantity`)) || 0;
-                              form.setValue(`items.${index}.amount`, quantity * rate);
+                              // Convert number to the correct type for the setValue function
+                              form.setValue(`items.${index}.amount`, quantity * rate as any);
                             }}
                           />
                         </FormControl>
