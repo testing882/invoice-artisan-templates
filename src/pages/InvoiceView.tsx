@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -122,7 +121,6 @@ const InvoiceView: React.FC = () => {
                 <p>{invoice.client.address}</p>
                 <p>{invoice.client.city}, {invoice.client.postalCode}</p>
                 <p>{invoice.client.country}</p>
-                <p>{invoice.client.email}</p>
               </div>
             </div>
           </div>
