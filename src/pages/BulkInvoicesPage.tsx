@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { format, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useInvoices } from '@/context/InvoicesContext';
 import { useTemplates } from '@/context/TemplatesContext';
@@ -33,7 +33,7 @@ const BulkInvoicesPage: React.FC = () => {
   const { templates } = useTemplates();
   const { addInvoice } = useInvoices();
   const [date, setDate] = useState<Date>(new Date());
-  const [dueDate, setDueDate] = useState<Date>(addDays(new Date(), 30));
+  const [dueDate, setDueDate] = useState<Date>(new Date());
   const [description, setDescription] = useState<string>('');
   const [companies, setCompanies] = useState<{ template: CompanyTemplate; amount: string }[]>([]);
 
@@ -48,10 +48,13 @@ const BulkInvoicesPage: React.FC = () => {
     }
   }, [templates, companies.length]);
 
-  // Update due date when invoice date changes
-  React.useEffect(() => {
-    setDueDate(addDays(date, 30));
-  }, [date]);
+  // Update due date when invoice date changes - set it to exactly the same date
+  const handleDateChange = (newDate: Date | undefined) => {
+    if (newDate) {
+      setDate(newDate);
+      setDueDate(newDate); // Set due date to be the same as invoice date
+    }
+  };
 
   const handleAmountChange = (index: number, value: string) => {
     const newCompanies = [...companies];
@@ -152,7 +155,7 @@ const BulkInvoicesPage: React.FC = () => {
                   <Calendar
                     mode="single"
                     selected={date}
-                    onSelect={(date) => date && setDate(date)}
+                    onSelect={handleDateChange}
                     initialFocus
                     className={cn("p-3 pointer-events-auto")}
                   />
