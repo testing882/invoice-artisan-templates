@@ -56,6 +56,7 @@ const sampleTemplates: CompanyTemplate[] = [
 
 export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [templates, setTemplates] = useState<CompanyTemplate[]>([]);
+  const [initialized, setInitialized] = useState(false);
 
   // Load saved templates from localStorage on initial render
   useEffect(() => {
@@ -71,17 +72,21 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           console.log('Parsed templates:', parsed);
           if (Array.isArray(parsed) && parsed.length > 0) {
             setTemplates(parsed);
+            setInitialized(true);
           } else {
             console.log('Saved templates is empty or invalid, using samples');
             setTemplates(sampleTemplates);
+            setInitialized(true);
           }
         } catch (parseError) {
           console.error('Error parsing templates:', parseError);
           setTemplates(sampleTemplates);
+          setInitialized(true);
         }
       } else {
         console.log('No saved templates found, using samples');
         setTemplates(sampleTemplates);
+        setInitialized(true);
       }
     } catch (error) {
       console.error('Error loading saved templates:', error);
@@ -89,11 +94,14 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       // Fallback to sample data if there's an error
       setTemplates(sampleTemplates);
+      setInitialized(true);
     }
   }, []);
 
-  // Save to localStorage whenever templates change
+  // Save to localStorage whenever templates change, but only after initial load
   useEffect(() => {
+    if (!initialized) return;
+    
     try {
       console.log('Saving templates to localStorage:', templates);
       localStorage.setItem(STORAGE_KEYS.TEMPLATES_STORAGE_KEY, JSON.stringify(templates));
@@ -101,7 +109,7 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.error('Error saving templates:', error);
       toast.error('Failed to save templates');
     }
-  }, [templates]);
+  }, [templates, initialized]);
 
   const addTemplate = (template: CompanyTemplate) => {
     console.log('Adding template:', template);

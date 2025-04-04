@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -52,16 +51,52 @@ const createEmptyItem = (): InvoiceItem => ({
 
 // Create a company template from localStorage data
 const createCompanyFromLocalStorage = (): CompanyTemplate => {
-  return {
-    id: "your-company",
-    name: localStorage.getItem('company_name') || 'Your Company',
-    address: localStorage.getItem('company_street') || '',
-    city: localStorage.getItem('company_city') || '',
-    postalCode: localStorage.getItem('company_zipCode') || '',
-    country: localStorage.getItem('company_country') || '',
-    phone: '',
-    email: localStorage.getItem('company_email') || '',
-  };
+  const COMPANY_STORAGE_KEY = 'invoiceArtisan_company';
+  
+  try {
+    // First try to load from the consolidated storage
+    const savedCompany = localStorage.getItem(COMPANY_STORAGE_KEY);
+    
+    if (savedCompany) {
+      const parsedCompany = JSON.parse(savedCompany);
+      return {
+        id: "your-company",
+        name: parsedCompany.name || 'Your Company',
+        address: parsedCompany.street || '',
+        city: parsedCompany.city || '',
+        postalCode: parsedCompany.zipCode || '',
+        country: parsedCompany.country || '',
+        phone: '',
+        email: parsedCompany.email || '',
+      };
+    }
+    
+    // Fallback to individual fields
+    return {
+      id: "your-company",
+      name: localStorage.getItem('company_name') || 'Your Company',
+      address: localStorage.getItem('company_street') || '',
+      city: localStorage.getItem('company_city') || '',
+      postalCode: localStorage.getItem('company_zipCode') || '',
+      country: localStorage.getItem('company_country') || '',
+      phone: '',
+      email: localStorage.getItem('company_email') || '',
+    };
+  } catch (error) {
+    console.error('Error creating company from localStorage:', error);
+    
+    // Return a default company if there's an error
+    return {
+      id: "your-company",
+      name: 'Your Company',
+      address: '',
+      city: '',
+      postalCode: '',
+      country: '',
+      phone: '',
+      email: '',
+    };
+  }
 };
 
 interface UseInvoiceFormProps {

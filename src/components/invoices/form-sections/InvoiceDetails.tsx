@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -18,19 +18,42 @@ interface InvoiceDetailsProps {
   templates: CompanyTemplate[];
 }
 
+const COMPANY_STORAGE_KEY = 'invoiceArtisan_company';
+
 const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
+  const [companyInfo, setCompanyInfo] = useState({
+    name: '',
+    street: '',
+    city: '',
+    zipCode: '',
+    country: '',
+    email: '',
+  });
+  
   useEffect(() => {
-    // Create a company object from localStorage data
-    const companyId = "your-company";
-    const companyName = localStorage.getItem('company_name') || 'Your Company';
-    const companyStreet = localStorage.getItem('company_street') || '';
-    const companyCity = localStorage.getItem('company_city') || '';
-    const companyZipCode = localStorage.getItem('company_zipCode') || '';
-    const companyCountry = localStorage.getItem('company_country') || '';
-    const companyEmail = localStorage.getItem('company_email') || '';
+    // Load company info
+    try {
+      const savedCompany = localStorage.getItem(COMPANY_STORAGE_KEY);
+      if (savedCompany) {
+        const parsedCompany = JSON.parse(savedCompany);
+        setCompanyInfo(parsedCompany);
+      } else {
+        // Fallback to individual fields
+        setCompanyInfo({
+          name: localStorage.getItem('company_name') || 'Your Company',
+          street: localStorage.getItem('company_street') || '',
+          city: localStorage.getItem('company_city') || '',
+          zipCode: localStorage.getItem('company_zipCode') || '',
+          country: localStorage.getItem('company_country') || '',
+          email: localStorage.getItem('company_email') || '',
+        });
+      }
+    } catch (error) {
+      console.error('Error loading company info in InvoiceDetails:', error);
+    }
     
     // Set the company ID in the form
-    form.setValue('companyId', companyId);
+    form.setValue('companyId', 'your-company');
   }, [form]);
 
   return (
@@ -138,10 +161,10 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
             <h3 className="text-sm font-semibold">Your Company</h3>
           </div>
           <div className="text-sm text-gray-500">
-            <p>{localStorage.getItem('company_name') || 'Company name not set'}</p>
-            <p>{localStorage.getItem('company_street') || ''}{localStorage.getItem('company_street') ? ', ' : ''}{localStorage.getItem('company_city') || ''}</p>
-            <p>{localStorage.getItem('company_zipCode') || ''}{localStorage.getItem('company_zipCode') ? ', ' : ''}{localStorage.getItem('company_country') || ''}</p>
-            <p>{localStorage.getItem('company_email') || ''}</p>
+            <p>{companyInfo.name || 'Company name not set'}</p>
+            <p>{companyInfo.street || ''}{companyInfo.street ? ', ' : ''}{companyInfo.city || ''}</p>
+            <p>{companyInfo.zipCode || ''}{companyInfo.zipCode ? ', ' : ''}{companyInfo.country || ''}</p>
+            <p>{companyInfo.email || ''}</p>
           </div>
         </CardContent>
       </Card>

@@ -17,6 +17,7 @@ const InvoicesContext = createContext<InvoicesContextType | undefined>(undefined
 
 export const InvoicesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [initialized, setInitialized] = useState(false);
   const { templates } = useTemplates();
 
   // Create a sample invoice using the first template
@@ -83,10 +84,12 @@ export const InvoicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           dueDate: new Date(invoice.dueDate),
         }));
         setInvoices(processedInvoices);
+        setInitialized(true);
       } else {
         console.log('No saved invoices found, using sample');
         const sampleInvoice = createSampleInvoice();
         setInvoices([sampleInvoice]);
+        setInitialized(true);
       }
     } catch (error) {
       console.error('Error loading saved invoices:', error);
@@ -95,12 +98,13 @@ export const InvoicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       // Fallback to sample data if there's an error
       const sampleInvoice = createSampleInvoice();
       setInvoices([sampleInvoice]);
+      setInitialized(true);
     }
   }, [templates]);
 
   // Save to localStorage whenever invoices change
   useEffect(() => {
-    if (invoices.length === 0) return;
+    if (!initialized || invoices.length === 0) return;
     
     try {
       localStorage.setItem(STORAGE_KEYS.INVOICES_STORAGE_KEY, JSON.stringify(invoices));
@@ -108,7 +112,7 @@ export const InvoicesProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.error('Error saving invoices:', error);
       toast.error('Failed to save invoices');
     }
-  }, [invoices]);
+  }, [invoices, initialized]);
 
   const addInvoice = (invoice: Invoice) => {
     setInvoices((prev) => [...prev, invoice]);
