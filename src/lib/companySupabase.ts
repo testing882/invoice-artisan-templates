@@ -1,11 +1,20 @@
 
 import { CompanyInfo } from '@/types/invoice';
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 import { getCurrentUserId } from './supabase';
 
 // Define a type for company settings from Supabase
-export type SupabaseCompanySettings = Database['public']['Tables']['company_settings']['Row'];
+export type SupabaseCompanySettings = {
+  id: string;
+  user_id: string;
+  name: string | null;
+  street: string | null;
+  city: string | null;
+  zip_code: string | null;
+  country: string | null;
+  email: string | null;
+  created_at: string;
+};
 
 // Convert snake_case from DB to camelCase for frontend
 export const mapCompanyFromSupabase = (company: SupabaseCompanySettings): CompanyInfo => ({

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CompanyInfo, CompanyTemplate } from '@/types/invoice';
+import { CompanyTemplate } from '@/types/invoice';
 import { UseFormReturn } from 'react-hook-form';
 import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
 import { Card, CardContent } from '@/components/ui/card';
-import { useCompanyData } from '@/hooks/useCompanyData';
+import { useCompany } from '@/context/CompanyContext';
 
 interface InvoiceDetailsProps {
   form: UseFormReturn<InvoiceFormValues>;
@@ -20,7 +20,7 @@ interface InvoiceDetailsProps {
 }
 
 const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
-  const { companyInfo, loading } = useCompanyData();
+  const { companyInfo, loading } = useCompany();
   
   useEffect(() => {
     // Set the company ID in the form

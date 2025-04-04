@@ -78,7 +78,7 @@ export const saveCompanyToDatabase = async (company: CompanyInfo): Promise<void>
         .update({
           ...supabaseCompany,
           user_id: userId
-        } as unknown as SupabaseCompanySettings)
+        })
         .eq('id', data.id);
       
       if (error) {
@@ -91,7 +91,7 @@ export const saveCompanyToDatabase = async (company: CompanyInfo): Promise<void>
         .insert({
           ...supabaseCompany,
           user_id: userId
-        } as unknown as SupabaseCompanySettings);
+        });
       
       if (error) {
         throw error;

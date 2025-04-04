@@ -4,13 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { useCompanyData } from '@/hooks/useCompanyData';
 import { LoaderCircle } from 'lucide-react';
 import { CompanyInfo } from '@/types/invoice';
+import { useCompany } from '@/context/CompanyContext';
 
 const CompanyPage: React.FC = () => {
-  const { companyInfo: initialCompany, saveCompany, loading } = useCompanyData();
+  const { companyInfo: initialCompany, saveCompany, loading } = useCompany();
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
     name: '',
     street: '',
