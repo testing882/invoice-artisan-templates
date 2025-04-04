@@ -24,6 +24,7 @@ const Auth: React.FC = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetInProgress, setResetInProgress] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // If user is already logged in and not in password recovery mode, redirect to home
   if (user && !loading && !isPasswordRecovery) {
@@ -33,14 +34,18 @@ const Auth: React.FC = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
+    
     try {
       const { error } = await signIn(email, password);
       if (error) {
+        setErrorMessage(error.message || 'Failed to sign in');
         toast.error(error.message || 'Failed to sign in');
       } else {
         toast.success('Signed in successfully!');
       }
     } catch (error: any) {
+      setErrorMessage(error.message || 'Failed to sign in');
       toast.error(error.message || 'Failed to sign in');
     } finally {
       setIsLoading(false);
@@ -50,9 +55,12 @@ const Auth: React.FC = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
+    
     try {
       const { error } = await signUp(email, password);
       if (error) {
+        setErrorMessage(error.message || 'Failed to sign up');
         toast.error(error.message || 'Failed to sign up');
       } else {
         setSuccessMessage('Account created successfully! Please check your email for verification.');
@@ -60,6 +68,7 @@ const Auth: React.FC = () => {
         setActiveTab('login');
       }
     } catch (error: any) {
+      setErrorMessage(error.message || 'Failed to sign up');
       toast.error(error.message || 'Failed to sign up');
     } finally {
       setIsLoading(false);
@@ -69,10 +78,12 @@ const Auth: React.FC = () => {
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setResetInProgress(true);
+    setErrorMessage(null);
     
     try {
       const { error } = await resetPassword(resetEmail);
       if (error) {
+        setErrorMessage(error.message || 'Failed to send reset password email');
         toast.error(error.message || 'Failed to send reset password email');
       } else {
         toast.success('Password reset email sent. Please check your inbox.');
@@ -80,6 +91,7 @@ const Auth: React.FC = () => {
         setResetEmail('');
       }
     } catch (error: any) {
+      setErrorMessage(error.message || 'Failed to send reset password email');
       toast.error(error.message || 'Failed to send reset password email');
     } finally {
       setResetInProgress(false);
@@ -88,13 +100,16 @@ const Auth: React.FC = () => {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     
     if (newPassword !== confirmPassword) {
+      setErrorMessage('Passwords do not match');
       toast.error('Passwords do not match');
       return;
     }
     
     if (newPassword.length < 6) {
+      setErrorMessage('Password must be at least 6 characters');
       toast.error('Password must be at least 6 characters');
       return;
     }
@@ -104,6 +119,7 @@ const Auth: React.FC = () => {
     try {
       const { error } = await updatePassword(newPassword);
       if (error) {
+        setErrorMessage(error.message || 'Failed to update password');
         toast.error(error.message || 'Failed to update password');
       } else {
         toast.success('Password updated successfully! You can now log in with your new password.');
@@ -111,6 +127,7 @@ const Auth: React.FC = () => {
         setConfirmPassword('');
       }
     } catch (error: any) {
+      setErrorMessage(error.message || 'Failed to update password');
       toast.error(error.message || 'Failed to update password');
     } finally {
       setIsLoading(false);
@@ -136,6 +153,13 @@ const Auth: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {errorMessage && (
+              <Alert className="mb-6 bg-red-50 border-red-200">
+                <AlertDescription className="text-center text-red-700 font-medium">
+                  {errorMessage}
+                </AlertDescription>
+              </Alert>
+            )}
             <form onSubmit={handleUpdatePassword} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="new-password">New Password</Label>
@@ -190,6 +214,14 @@ const Auth: React.FC = () => {
             <Alert className="mb-6 bg-green-50 border-green-200">
               <AlertDescription className="text-center text-green-700 font-medium">
                 {successMessage}
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {errorMessage && (
+            <Alert className="mb-6 bg-red-50 border-red-200">
+              <AlertDescription className="text-center text-red-700 font-medium">
+                {errorMessage}
               </AlertDescription>
             </Alert>
           )}
@@ -297,6 +329,13 @@ const Auth: React.FC = () => {
               Enter your email address and we'll send you a link to reset your password.
             </DialogDescription>
           </DialogHeader>
+          {errorMessage && showForgotPassword && (
+            <Alert className="mt-4 bg-red-50 border-red-200">
+              <AlertDescription className="text-center text-red-700 font-medium">
+                {errorMessage}
+              </AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleForgotPassword} className="space-y-4 mt-4">
             <div className="space-y-2">
               <Label htmlFor="reset-email">Email</Label>

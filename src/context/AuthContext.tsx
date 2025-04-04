@@ -110,12 +110,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updatePassword = async (newPassword: string) => {
     try {
+      // Check if we're in a recovery flow or have a valid session
+      if (!session && !isPasswordRecovery) {
+        return { error: new Error('Auth session missing!') };
+      }
+      
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       });
 
       if (!error) {
         setIsPasswordRecovery(false);
+        // After successful password update, redirect to login
+        navigate('/auth');
       }
       
       return { error };
