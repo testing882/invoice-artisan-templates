@@ -15,6 +15,7 @@ import InvoiceEditor from "./pages/InvoiceEditor";
 import InvoiceView from "./pages/InvoiceView";
 import Export from "./pages/Export";
 import NotFound from "./pages/NotFound";
+import CompanyPage from "./pages/CompanyPage";
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/create-invoice/:id" element={<InvoiceEditor />} />
               <Route path="/invoice/:id" element={<InvoiceView />} />
               <Route path="/export" element={<Export />} />
+              <Route path="/company" element={<CompanyPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </MainLayout>

@@ -11,7 +11,7 @@ interface NotesAndTermsFormProps {
 
 const NotesAndTermsForm: React.FC<NotesAndTermsFormProps> = ({ form }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6">
       <FormField
         control={form.control}
         name="notes"
@@ -21,24 +21,6 @@ const NotesAndTermsForm: React.FC<NotesAndTermsFormProps> = ({ form }) => {
             <FormControl>
               <Textarea 
                 placeholder="Any additional information for the client..."
-                className="min-h-[100px]"
-                {...field} 
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="terms"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Terms & Conditions</FormLabel>
-            <FormControl>
-              <Textarea 
-                placeholder="Payment terms, conditions, etc..."
                 className="min-h-[100px]"
                 {...field} 
               />

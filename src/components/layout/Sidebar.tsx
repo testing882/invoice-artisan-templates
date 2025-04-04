@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FileText, Download, CalendarPlus } from 'lucide-react';
+import { FileText, Download, CalendarPlus, Building } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const Sidebar: React.FC = () => {
@@ -9,6 +9,7 @@ export const Sidebar: React.FC = () => {
     { name: 'Dashboard', path: '/', icon: <FileText className="w-5 h-5" /> },
     { name: 'Create Invoice', path: '/create-invoice', icon: <FileText className="w-5 h-5" /> },
     { name: 'Templates', path: '/templates', icon: <CalendarPlus className="w-5 h-5" /> },
+    { name: 'Your Company', path: '/company', icon: <Building className="w-5 h-5" /> },
     { name: 'Export', path: '/export', icon: <Download className="w-5 h-5" /> },
   ];
 

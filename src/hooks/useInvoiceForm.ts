@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -35,7 +36,6 @@ const invoiceSchema = z.object({
   client: clientSchema,
   items: z.array(invoiceItemSchema).nonempty("At least one item is required"),
   notes: z.string().optional(),
-  terms: z.string().optional(),
   taxRate: z.coerce.number().min(0, "Tax rate cannot be negative").optional(),
 });
 
@@ -66,7 +66,6 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     client: initialData.client,
     items: initialData.items,
     notes: initialData.notes || '',
-    terms: initialData.terms || '',
     taxRate: initialData.taxRate || 0,
   } : {
     invoiceNumber: generateInvoiceNumber(),
@@ -82,7 +81,6 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     } as ClientInfo,
     items: [createEmptyItem()],
     notes: '',
-    terms: '',
     taxRate: 0,
   };
   
@@ -151,7 +149,6 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
         })
       })),
       notes: values.notes,
-      terms: values.terms,
       totalAmount: subtotal,
       taxRate: values.taxRate,
       taxAmount: taxAmount,
