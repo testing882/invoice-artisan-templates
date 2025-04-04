@@ -11,9 +11,9 @@ interface InvoiceContextType {
   addInvoice: (invoice: Invoice) => void;
   updateInvoice: (invoice: Invoice) => void;
   deleteInvoice: (id: string) => void;
-  addTemplate: (template: CompanyTemplate) => void;
-  updateTemplate: (template: CompanyTemplate) => void;
-  deleteTemplate: (id: string) => void;
+  addTemplate: (template: CompanyTemplate) => Promise<void>;
+  updateTemplate: (template: CompanyTemplate) => Promise<void>;
+  deleteTemplate: (id: string) => Promise<void>;
   getTemplateById: (id: string) => CompanyTemplate | undefined;
   getInvoiceById: (id: string) => Invoice | undefined;
 }

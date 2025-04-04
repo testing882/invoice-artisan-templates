@@ -72,6 +72,12 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         // Get current user ID
         const userId = await getCurrentUserId();
         
+        if (!userId) {
+          console.log('No authenticated user, using sample templates');
+          setTemplates(sampleTemplates);
+          return;
+        }
+        
         // Fetch templates for the current user
         const { data, error } = await supabase
           .from('templates')
@@ -104,9 +110,22 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                   user_id: userId
                 });
             }
+            
+            // Fetch templates again after inserting samples
+            const { data: refreshedData } = await supabase
+              .from('templates')
+              .select('*')
+              .eq('user_id', userId);
+              
+            if (refreshedData && refreshedData.length > 0) {
+              const mappedTemplates = refreshedData.map(mapTemplateFromSupabase);
+              setTemplates(mappedTemplates);
+            } else {
+              setTemplates(sampleTemplates);
+            }
+          } else {
+            setTemplates(sampleTemplates);
           }
-          
-          setTemplates(sampleTemplates);
         }
       } catch (err) {
         console.error('Error loading templates:', err);
@@ -130,6 +149,11 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       
       // Get current user ID
       const userId = await getCurrentUserId();
+      
+      if (!userId) {
+        toast.error('You must be logged in to create templates');
+        return;
+      }
       
       // Map template to Supabase format
       const supabaseTemplate = mapTemplateToSupabase(template);
@@ -162,13 +186,24 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.log('Updating template:', template);
       setLoading(true);
       
+      // Get current user ID
+      const userId = await getCurrentUserId();
+      
+      if (!userId) {
+        toast.error('You must be logged in to update templates');
+        return;
+      }
+      
       // Map template to Supabase format
       const supabaseTemplate = mapTemplateToSupabase(template);
       
       // Update template in Supabase
       const { error } = await supabase
         .from('templates')
-        .update(supabaseTemplate)
+        .update({
+          ...supabaseTemplate,
+          user_id: userId
+        })
         .eq('id', template.id);
       
       if (error) {
