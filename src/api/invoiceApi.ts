@@ -1,7 +1,7 @@
 
 import { Invoice } from '@/types/invoice';
 import { supabase } from '@/integrations/supabase/client';
-import { mapInvoiceFromSupabase, mapInvoiceToSupabase } from '@/lib/invoiceSupabase';
+import { mapInvoiceFromSupabase, mapInvoiceToSupabase, SupabaseInvoice } from '@/lib/invoiceSupabase';
 import { getCurrentUserId } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -30,7 +30,7 @@ export const fetchInvoices = async (): Promise<Invoice[]> => {
     
     if (data && data.length > 0) {
       // Map invoices from Supabase format to application format
-      return data.map(invoice => mapInvoiceFromSupabase(invoice as any));
+      return data.map(invoice => mapInvoiceFromSupabase(invoice as SupabaseInvoice));
     } else {
       // Return empty array if no invoices found
       console.log('No invoices found, returning empty array');
@@ -65,7 +65,7 @@ export const addInvoiceToDatabase = async (invoice: Invoice): Promise<void> => {
       .insert({
         ...supabaseInvoice,
         user_id: userId
-      } as any);
+      } as unknown as SupabaseInvoice);
     
     if (error) {
       throw error;
@@ -99,7 +99,7 @@ export const updateInvoiceInDatabase = async (invoice: Invoice): Promise<void> =
       .update({
         ...supabaseInvoice,
         user_id: userId
-      } as any)
+      } as unknown as SupabaseInvoice)
       .eq('id', invoice.id);
     
     if (error) {
