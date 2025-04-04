@@ -22,7 +22,9 @@ export const mapTemplateFromSupabase = (template: SupabaseTemplate): CompanyTemp
   taxId: template.tax_id || '',
   description: template.description || '',
   logo: template.logo || '',
+  notes: template.notes || '',
   isEU: template.is_eu || false,
+  vatNumber: template.vat_number || '',
 });
 
 // Convert camelCase from frontend to snake_case for DB
@@ -39,6 +41,8 @@ export const mapTemplateToSupabase = (template: CompanyTemplate): Omit<SupabaseT
   description: template.description || null,
   logo: template.logo || null,
   is_eu: template.isEU,
+  notes: template.notes || null,
+  vat_number: template.vatNumber || null,
 });
 
 // Get current user ID

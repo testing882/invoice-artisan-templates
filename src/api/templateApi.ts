@@ -63,6 +63,8 @@ export const addTemplateToDatabase = async (template: CompanyTemplate): Promise<
     // Map template to Supabase format
     const supabaseTemplate = mapTemplateToSupabase(template);
     
+    console.log('Adding template to database:', supabaseTemplate);
+    
     // Insert template into Supabase
     const { error } = await supabase
       .from('templates')
@@ -72,6 +74,7 @@ export const addTemplateToDatabase = async (template: CompanyTemplate): Promise<
       });
     
     if (error) {
+      console.error('Error inserting template:', error);
       throw error;
     }
     
@@ -97,6 +100,8 @@ export const updateTemplateInDatabase = async (template: CompanyTemplate): Promi
     // Map template to Supabase format
     const supabaseTemplate = mapTemplateToSupabase(template);
     
+    console.log('Updating template in database:', supabaseTemplate);
+    
     // Update template in Supabase
     const { error } = await supabase
       .from('templates')
@@ -107,6 +112,7 @@ export const updateTemplateInDatabase = async (template: CompanyTemplate): Promi
       .eq('id', template.id);
     
     if (error) {
+      console.error('Error updating template:', error);
       throw error;
     }
     
