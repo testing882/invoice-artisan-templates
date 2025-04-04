@@ -10,7 +10,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, FileText, Trash } from 'lucide-react';
+import { Plus, FileText, Trash, AlertCircle } from 'lucide-react';
 import { useInvoice } from '@/context/InvoiceContext';
 import {
   AlertDialog,
@@ -35,6 +35,9 @@ const Templates: React.FC = () => {
     }
   };
   
+  // Log the templates to help with debugging
+  console.log('Current templates:', templates);
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -48,7 +51,7 @@ const Templates: React.FC = () => {
         </Button>
       </div>
       
-      {templates.length > 0 ? (
+      {templates && templates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {templates.map((template) => (
             <Card key={template.id} className="hover:shadow-md transition-shadow">
@@ -56,7 +59,7 @@ const Templates: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>{template.name}</CardTitle>
-                    <CardDescription>{template.email}</CardDescription>
+                    <CardDescription>{template.email || 'No email provided'}</CardDescription>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-invoice-blue flex items-center justify-center text-white font-medium">
                     {template.name.charAt(0)}
@@ -68,7 +71,7 @@ const Templates: React.FC = () => {
                   <p>{template.address}</p>
                   <p>{template.city}, {template.postalCode}</p>
                   <p>{template.country}</p>
-                  <p>{template.phone}</p>
+                  <p>{template.phone || 'No phone provided'}</p>
                   {template.taxId && <p><span className="font-medium">Tax ID:</span> {template.taxId}</p>}
                 </div>
               </CardContent>
@@ -102,7 +105,8 @@ const Templates: React.FC = () => {
       ) : (
         <Card>
           <CardContent className="pt-6 pb-6 flex flex-col items-center justify-center">
-            <p className="text-invoice-gray mb-4">No templates created yet</p>
+            <AlertCircle className="w-12 h-12 text-amber-500 mb-4" />
+            <p className="text-invoice-gray mb-4 text-center">No templates found. Create your first template to get started.</p>
             <Button 
               onClick={() => navigate('/templates/new')}
               className="bg-invoice-blue hover:bg-invoice-darkBlue"

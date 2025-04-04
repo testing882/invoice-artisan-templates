@@ -22,8 +22,11 @@ const templateSchema = z.object({
   city: z.string().min(1, "City is required"),
   postalCode: z.string().min(1, "Postal code is required"),
   country: z.string().min(1, "Country is required"),
-  description: z.string().optional(),
-  logo: z.string().optional(),
+  email: z.string().email("Invalid email").optional().or(z.literal('')),
+  phone: z.string().optional().or(z.literal('')),
+  taxId: z.string().optional().or(z.literal('')),
+  description: z.string().optional().or(z.literal('')),
+  logo: z.string().optional().or(z.literal('')),
   isEU: z.boolean().default(false),
 });
 
@@ -35,6 +38,8 @@ interface TemplateFormProps {
 }
 
 const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) => {
+  console.log('Initial template data:', initialData);
+  
   const form = useForm<TemplateFormValues>({
     resolver: zodResolver(templateSchema),
     defaultValues: initialData ? {
@@ -43,6 +48,9 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       city: initialData.city,
       postalCode: initialData.postalCode,
       country: initialData.country,
+      email: initialData.email || '',
+      phone: initialData.phone || '',
+      taxId: initialData.taxId || '',
       description: initialData.description || '',
       logo: initialData.logo || '',
       isEU: initialData.isEU || false,
@@ -52,6 +60,9 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       city: '',
       postalCode: '',
       country: '',
+      email: '',
+      phone: '',
+      taxId: '',
       description: '',
       logo: '',
       isEU: false,
@@ -59,6 +70,8 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
   });
 
   const handleSubmit = (values: TemplateFormValues) => {
+    console.log('Form values on submit:', values);
+    
     const template: CompanyTemplate = {
       id: initialData?.id || crypto.randomUUID(),
       name: values.name,
@@ -66,13 +79,15 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       city: values.city,
       postalCode: values.postalCode,
       country: values.country,
-      email: initialData?.email || '',
-      phone: initialData?.phone || '',
-      taxId: initialData?.taxId || '',
-      logo: values.logo,
-      description: values.description,
-      isEU: values.isEU,
+      email: values.email || '',
+      phone: values.phone || '',
+      taxId: values.taxId || '',
+      logo: values.logo || '',
+      description: values.description || '',
+      isEU: values.isEU || false,
     };
+    
+    console.log('Generated template:', template);
     onSubmit(template);
   };
 
@@ -88,6 +103,48 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
                 <FormLabel>Company Name</FormLabel>
                 <FormControl>
                   <Input placeholder="Acme Inc" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="billing@company.com" type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input placeholder="(555) 123-4567" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="taxId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tax ID</FormLabel>
+                <FormControl>
+                  <Input placeholder="US12345678" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

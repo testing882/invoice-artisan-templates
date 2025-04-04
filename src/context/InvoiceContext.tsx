@@ -104,8 +104,11 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Load saved data from localStorage on initial render
   useEffect(() => {
     try {
+      console.log('Loading data from localStorage');
       const savedInvoices = localStorage.getItem(INVOICES_STORAGE_KEY);
       const savedTemplates = localStorage.getItem(TEMPLATES_STORAGE_KEY);
+      
+      console.log('Saved templates:', savedTemplates);
       
       if (savedInvoices) {
         const parsedInvoices = JSON.parse(savedInvoices);
@@ -117,14 +120,26 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }));
         setInvoices(processedInvoices);
       } else {
-        // Set sample invoice if no saved invoices
+        console.log('No saved invoices found, using sample');
         setInvoices([sampleInvoice]);
       }
       
       if (savedTemplates) {
-        setTemplates(JSON.parse(savedTemplates));
+        try {
+          const parsed = JSON.parse(savedTemplates);
+          console.log('Parsed templates:', parsed);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setTemplates(parsed);
+          } else {
+            console.log('Saved templates is empty or invalid, using samples');
+            setTemplates(sampleTemplates);
+          }
+        } catch (parseError) {
+          console.error('Error parsing templates:', parseError);
+          setTemplates(sampleTemplates);
+        }
       } else {
-        // Set sample templates if no saved templates
+        console.log('No saved templates found, using samples');
         setTemplates(sampleTemplates);
       }
     } catch (error) {
@@ -140,6 +155,7 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Save to localStorage whenever data changes
   useEffect(() => {
     try {
+      console.log('Saving templates to localStorage:', templates);
       localStorage.setItem(INVOICES_STORAGE_KEY, JSON.stringify(invoices));
       localStorage.setItem(TEMPLATES_STORAGE_KEY, JSON.stringify(templates));
     } catch (error) {
@@ -164,16 +180,19 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const addTemplate = (template: CompanyTemplate) => {
+    console.log('Adding template:', template);
     setTemplates((prev) => [...prev, template]);
     toast.success('Template created successfully');
   };
 
   const updateTemplate = (template: CompanyTemplate) => {
+    console.log('Updating template:', template);
     setTemplates((prev) => prev.map((temp) => (temp.id === template.id ? template : temp)));
     toast.success('Template updated successfully');
   };
 
   const deleteTemplate = (id: string) => {
+    console.log('Deleting template:', id);
     setTemplates((prev) => prev.filter((template) => template.id !== id));
     toast.success('Template deleted successfully');
   };
