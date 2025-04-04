@@ -52,4 +52,6 @@ export interface Invoice {
   taxRate?: number;
   taxAmount?: number;
   status: 'draft' | 'sent' | 'paid';
+  deleted?: boolean;
+  deletedAt?: Date;
 }

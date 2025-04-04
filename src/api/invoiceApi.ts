@@ -5,6 +5,12 @@ import { mapInvoiceFromSupabase, mapInvoiceToSupabase, SupabaseInvoice } from '@
 import { getCurrentUserId } from '@/lib/supabase';
 import { toast } from 'sonner';
 
+interface BulkUpdateData {
+  date?: Date;
+  dueDate?: Date;
+  notes?: string;
+}
+
 // Function to fetch invoices from Supabase
 export const fetchInvoices = async (): Promise<Invoice[]> => {
   try {
@@ -30,7 +36,17 @@ export const fetchInvoices = async (): Promise<Invoice[]> => {
     
     if (data && data.length > 0) {
       // Map invoices from Supabase format to application format
-      return data.map(invoice => mapInvoiceFromSupabase(invoice as SupabaseInvoice));
+      return data.map(invoice => {
+        const mappedInvoice = mapInvoiceFromSupabase(invoice as SupabaseInvoice);
+        
+        // Add deleted status
+        mappedInvoice.deleted = invoice.deleted || false;
+        if (invoice.deleted_at) {
+          mappedInvoice.deletedAt = new Date(invoice.deleted_at);
+        }
+        
+        return mappedInvoice;
+      });
     } else {
       // Return empty array if no invoices found
       console.log('No invoices found, returning empty array');
@@ -64,7 +80,8 @@ export const addInvoiceToDatabase = async (invoice: Invoice): Promise<void> => {
       .from('invoices')
       .insert({
         ...supabaseInvoice,
-        user_id: userId
+        user_id: userId,
+        deleted: false
       } as unknown as SupabaseInvoice);
     
     if (error) {
@@ -114,7 +131,7 @@ export const updateInvoiceInDatabase = async (invoice: Invoice): Promise<void> =
   }
 };
 
-// Function to delete an invoice from Supabase
+// Function to delete an invoice from Supabase (hard delete)
 export const deleteInvoiceFromDatabase = async (id: string): Promise<void> => {
   try {
     const userId = await getCurrentUserId();
@@ -137,6 +154,131 @@ export const deleteInvoiceFromDatabase = async (id: string): Promise<void> => {
   } catch (err) {
     console.error('Error deleting invoice:', err);
     toast.error('Failed to delete invoice');
+    throw err;
+  }
+};
+
+// Function to soft delete an invoice (mark as deleted)
+export const softDeleteInvoiceInDatabase = async (id: string): Promise<void> => {
+  try {
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
+      toast.error('You must be logged in to delete invoices');
+      return;
+    }
+    
+    const { error } = await supabase
+      .from('invoices')
+      .update({
+        deleted: true,
+        deleted_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .eq('user_id', userId);
+    
+    if (error) {
+      throw error;
+    }
+  } catch (err) {
+    console.error('Error soft deleting invoice:', err);
+    toast.error('Failed to move invoice to trash');
+    throw err;
+  }
+};
+
+// Function to permanently delete an invoice
+export const permanentlyDeleteInvoiceInDatabase = async (id: string): Promise<void> => {
+  try {
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
+      toast.error('You must be logged in to delete invoices');
+      return;
+    }
+    
+    const { error } = await supabase
+      .from('invoices')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+    
+    if (error) {
+      throw error;
+    }
+  } catch (err) {
+    console.error('Error permanently deleting invoice:', err);
+    toast.error('Failed to delete invoice permanently');
+    throw err;
+  }
+};
+
+// Function to restore a soft-deleted invoice
+export const restoreInvoiceInDatabase = async (id: string): Promise<void> => {
+  try {
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
+      toast.error('You must be logged in to restore invoices');
+      return;
+    }
+    
+    const { error } = await supabase
+      .from('invoices')
+      .update({
+        deleted: false,
+        deleted_at: null
+      })
+      .eq('id', id)
+      .eq('user_id', userId);
+    
+    if (error) {
+      throw error;
+    }
+  } catch (err) {
+    console.error('Error restoring invoice:', err);
+    toast.error('Failed to restore invoice');
+    throw err;
+  }
+};
+
+// Function to bulk update invoices
+export const bulkUpdateInvoicesInDatabase = async (ids: string[], data: BulkUpdateData): Promise<void> => {
+  try {
+    const userId = await getCurrentUserId();
+    
+    if (!userId) {
+      toast.error('You must be logged in to update invoices');
+      return;
+    }
+    
+    // Prepare update data
+    const updateData: Record<string, any> = {};
+    
+    if (data.date) updateData.date = data.date.toISOString();
+    if (data.dueDate) updateData.due_date = data.dueDate.toISOString();
+    if (data.notes !== undefined) updateData.notes = data.notes;
+    
+    // No updates to make
+    if (Object.keys(updateData).length === 0) {
+      return;
+    }
+    
+    // Update each invoice one by one
+    for (const id of ids) {
+      const { error } = await supabase
+        .from('invoices')
+        .update(updateData)
+        .eq('id', id)
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error(`Error updating invoice ${id}:`, error);
+      }
+    }
+  } catch (err) {
+    console.error('Error bulk updating invoices:', err);
+    toast.error('Failed to update invoices');
     throw err;
   }
 };

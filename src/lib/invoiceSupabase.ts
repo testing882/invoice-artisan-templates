@@ -5,7 +5,10 @@ import { Database } from '@/integrations/supabase/types';
 import { getCurrentUserId } from './supabase';
 
 // Define a type for invoices from Supabase
-export type SupabaseInvoice = Database['public']['Tables']['invoices']['Row'];
+export type SupabaseInvoice = Database['public']['Tables']['invoices']['Row'] & {
+  deleted?: boolean;
+  deleted_at?: string;
+};
 
 // Convert snake_case from DB to camelCase for frontend
 export const mapInvoiceFromSupabase = (invoice: SupabaseInvoice): Invoice => ({
@@ -21,6 +24,8 @@ export const mapInvoiceFromSupabase = (invoice: SupabaseInvoice): Invoice => ({
   totalAmount: Number(invoice.total_amount),
   taxRate: invoice.tax_rate ? Number(invoice.tax_rate) : undefined,
   taxAmount: invoice.tax_amount ? Number(invoice.tax_amount) : undefined,
+  deleted: invoice.deleted || false,
+  deletedAt: invoice.deleted_at ? new Date(invoice.deleted_at) : undefined,
 });
 
 // Convert camelCase from frontend to snake_case for DB
@@ -37,4 +42,6 @@ export const mapInvoiceToSupabase = (invoice: Invoice): Omit<SupabaseInvoice, 'c
   total_amount: invoice.totalAmount,
   tax_rate: invoice.taxRate || null,
   tax_amount: invoice.taxAmount || null,
+  deleted: invoice.deleted || false,
+  deleted_at: invoice.deletedAt ? invoice.deletedAt.toISOString() : null,
 });

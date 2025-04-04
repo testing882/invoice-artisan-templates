@@ -3,11 +3,21 @@ import React, { createContext, useContext } from 'react';
 import { Invoice } from '@/types/invoice';
 import { useInvoicesData } from '@/hooks/useInvoicesData';
 
+interface BulkUpdateData {
+  date?: Date;
+  dueDate?: Date;
+  notes?: string;
+}
+
 interface InvoicesContextType {
   invoices: Invoice[];
   addInvoice: (invoice: Invoice) => Promise<void>;
   updateInvoice: (invoice: Invoice) => Promise<void>;
   deleteInvoice: (id: string) => Promise<void>;
+  softDeleteInvoice: (id: string) => Promise<void>;
+  permanentlyDeleteInvoice: (id: string) => Promise<void>;
+  restoreInvoice: (id: string) => Promise<void>;
+  bulkUpdateInvoices: (ids: string[], data: BulkUpdateData) => Promise<void>;
   getInvoiceById: (id: string) => Invoice | undefined;
   loading: boolean;
   error: string | null;

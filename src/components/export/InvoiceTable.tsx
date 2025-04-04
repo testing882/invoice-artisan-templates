@@ -12,7 +12,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Download, Edit, Eye, Trash } from 'lucide-react';
+import { Download, Edit, Eye, Trash, RefreshCw } from 'lucide-react';
 import { formatCurrency } from '@/lib/invoice-utils';
 import { Invoice } from '@/types/invoice';
 
@@ -24,6 +24,9 @@ interface InvoiceTableProps {
   handleExport: (id: string) => void;
   handleEdit?: (id: string) => void;
   handleDelete?: (id: string) => void;
+  showRestore?: boolean;
+  handleRestore?: (id: string) => void;
+  deleteButtonText?: string;
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
@@ -34,6 +37,9 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   handleExport,
   handleEdit,
   handleDelete,
+  showRestore = false,
+  handleRestore,
+  deleteButtonText = "Delete",
 }) => {
   const navigate = useNavigate();
   const selectedCount = selectedInvoices.length;
@@ -97,29 +103,44 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => navigate(`/invoice/${invoice.id}`)}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleExport(invoice.id)}
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                      {handleEdit && (
+                      {!showRestore && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => navigate(`/invoice/${invoice.id}`)}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleExport(invoice.id)}
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                          {handleEdit && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEdit(invoice.id)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </>
+                      )}
+                      
+                      {showRestore && handleRestore && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(invoice.id)}
+                          onClick={() => handleRestore(invoice.id)}
                         >
-                          <Edit className="w-4 h-4" />
+                          <RefreshCw className="w-4 h-4" />
                         </Button>
                       )}
+                      
                       {handleDelete && (
                         <Button
                           variant="ghost"
@@ -137,9 +158,11 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-10">
-                  {(selectedInvoices.length > 0) 
-                    ? "No invoices found for the selected filters" 
-                    : "No invoices created yet"}
+                  {showRestore 
+                    ? "No deleted invoices found" 
+                    : (selectedInvoices.length > 0) 
+                      ? "No invoices found for the selected filters" 
+                      : "No invoices created yet"}
                 </TableCell>
               </TableRow>
             )}

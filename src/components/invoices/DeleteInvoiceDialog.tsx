@@ -17,6 +17,7 @@ interface DeleteInvoiceDialogProps {
   onConfirmDelete: () => void;
   isBulkDelete?: boolean;
   count?: number;
+  permanentDelete?: boolean;
 }
 
 const DeleteInvoiceDialog: React.FC<DeleteInvoiceDialogProps> = ({
@@ -25,6 +26,7 @@ const DeleteInvoiceDialog: React.FC<DeleteInvoiceDialogProps> = ({
   onConfirmDelete,
   isBulkDelete = false,
   count = 1,
+  permanentDelete = false,
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -32,15 +34,21 @@ const DeleteInvoiceDialog: React.FC<DeleteInvoiceDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            {isBulkDelete 
-              ? `This will permanently delete ${count} selected invoice${count !== 1 ? 's' : ''}. This action cannot be undone.`
-              : 'This will permanently delete this invoice. This action cannot be undone.'}
+            {permanentDelete ? (
+              isBulkDelete 
+                ? `This will permanently delete ${count} selected invoice${count !== 1 ? 's' : ''}. This action cannot be undone.`
+                : 'This will permanently delete this invoice. This action cannot be undone.'
+            ) : (
+              isBulkDelete 
+                ? `This will move ${count} selected invoice${count !== 1 ? 's' : ''} to trash. Invoices in trash will be deleted permanently after 30 days.`
+                : 'This will move this invoice to trash. Invoices in trash will be deleted permanently after 30 days.'
+            )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={onConfirmDelete} className="bg-destructive text-destructive-foreground">
-            Delete
+            {permanentDelete ? 'Delete Permanently' : 'Move to Trash'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
