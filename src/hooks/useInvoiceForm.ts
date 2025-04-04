@@ -76,13 +76,13 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
     companyId: templateId || (templates.length > 0 ? templates[0].id : ''),
     client: {
-      name: '',                // Make sure all required properties of ClientInfo are present
+      name: '',
       address: '',
       city: '',
       postalCode: '',
       country: '',
       email: '',
-    } as ClientInfo,           // Explicit type casting to ensure TypeScript recognizes it as ClientInfo
+    } satisfies ClientInfo,  // Using satisfies to ensure type correctness without casting
     items: [createEmptyItem()],
     notes: '',
     terms: '',
