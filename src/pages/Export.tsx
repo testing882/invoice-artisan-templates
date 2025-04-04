@@ -14,7 +14,7 @@ const Export: React.FC = () => {
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [selectedCompany, setSelectedCompany] = useState<string>("");
+  const [selectedCompany, setSelectedCompany] = useState<string>("all");
   
   // Get unique client company names for the filter
   const uniqueCompanies = React.useMemo(() => {
@@ -33,7 +33,7 @@ const Export: React.FC = () => {
     }
     
     let companyCondition = true;
-    if (selectedCompany) {
+    if (selectedCompany && selectedCompany !== "all") {
       companyCondition = invoice.client.name === selectedCompany;
     }
     
@@ -103,7 +103,7 @@ const Export: React.FC = () => {
   const clearFilters = () => {
     setStartDate(undefined);
     setEndDate(undefined);
-    setSelectedCompany("");
+    setSelectedCompany("all");
   };
   
   return (

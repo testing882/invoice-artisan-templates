@@ -116,7 +116,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
               <SelectValue placeholder="Filter by company" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Companies</SelectItem>
+              <SelectItem value="all">All Companies</SelectItem>
               {uniqueCompanies.map((company) => (
                 <SelectItem key={company} value={company}>
                   {company}
