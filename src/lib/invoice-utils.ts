@@ -94,22 +94,16 @@ export const exportToPdf = (invoice: Invoice): void => {
   // Get the final Y position after the table
   const finalY = (doc as any).lastAutoTable.finalY || 110;
   
-  // Add totals
-  doc.text(`Subtotal:`, 140, finalY + 10);
-  doc.text(`${formatCurrency(invoice.totalAmount)}`, 170, finalY + 10, { align: 'right' });
+  // Add Subtotal and Amount Paid only (no Total)
+  // Making sure they align properly by using the same position for the labels
+  const labelX = 120; // Starting position for the labels
+  const valueX = 170; // Position for the values (aligned right)
   
-  doc.text(`Amount Paid:`, 140, finalY + 17);
-  doc.text(`${formatCurrency(invoice.totalAmount)}`, 170, finalY + 17, { align: 'right' });
+  doc.text(`Subtotal:`, labelX, finalY + 10);
+  doc.text(`${formatCurrency(invoice.totalAmount)}`, valueX, finalY + 10, { align: 'right' });
   
-  if (invoice.taxRate && invoice.taxAmount) {
-    doc.text(`Tax (${invoice.taxRate}%):`, 140, finalY + 24);
-    doc.text(`${formatCurrency(invoice.taxAmount)}`, 170, finalY + 24, { align: 'right' });
-    doc.text(`Total:`, 140, finalY + 31);
-    doc.text(`${formatCurrency(invoice.totalAmount + invoice.taxAmount)}`, 170, finalY + 31, { align: 'right' });
-  } else {
-    doc.text(`Total:`, 140, finalY + 24);
-    doc.text(`${formatCurrency(invoice.totalAmount)}`, 170, finalY + 24, { align: 'right' });
-  }
+  doc.text(`Amount Paid:`, labelX, finalY + 17);
+  doc.text(`${formatCurrency(invoice.totalAmount)}`, valueX, finalY + 17, { align: 'right' });
   
   // Add notes
   if (invoice.notes) {

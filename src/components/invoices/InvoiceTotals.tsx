@@ -25,18 +25,6 @@ const InvoiceTotals: React.FC<InvoiceTotalsProps> = ({
           <span>Amount Paid:</span>
           <span>{formatCurrency(totalAmount)}</span>
         </div>
-        
-        {taxRate && taxAmount && (
-          <div className="flex justify-between">
-            <span>Tax ({taxRate}%):</span>
-            <span>{formatCurrency(taxAmount)}</span>
-          </div>
-        )}
-        
-        <div className="flex justify-between font-bold pt-2 border-t">
-          <span>Total:</span>
-          <span>{formatCurrency(totalAmount + (taxAmount || 0))}</span>
-        </div>
       </div>
     </div>
   );
