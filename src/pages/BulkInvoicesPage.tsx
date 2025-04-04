@@ -1,32 +1,13 @@
 
-import React, { useState } from 'react';
-import { format } from 'date-fns';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInvoices } from '@/context/InvoicesContext';
 import { useTemplates } from '@/context/TemplatesContext';
-import { CalendarIcon, Plus, Trash } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import { generateInvoiceNumber, calculateItemAmount } from '@/lib/invoice-utils';
+import { generateInvoiceNumber } from '@/lib/invoice-utils';
 import { CompanyTemplate, ClientInfo, Invoice } from '@/types/invoice';
-import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
+import InvoiceDetailsForm from '@/components/bulk-invoices/InvoiceDetailsForm';
+import CompanyAmountsTable from '@/components/bulk-invoices/CompanyAmountsTable';
 
 const BulkInvoicesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +18,7 @@ const BulkInvoicesPage: React.FC = () => {
   const [description, setDescription] = useState<string>('');
   const [companies, setCompanies] = useState<{ template: CompanyTemplate; amount: string }[]>([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (templates.length > 0 && companies.length === 0) {
       // Sort templates alphabetically by name before setting companies state
       const sortedTemplates = [...templates].sort((a, b) => 
@@ -52,14 +33,6 @@ const BulkInvoicesPage: React.FC = () => {
       );
     }
   }, [templates, companies.length]);
-
-  // Update due date when invoice date changes - set it to exactly the same date
-  const handleDateChange = (newDate: Date | undefined) => {
-    if (newDate) {
-      setDate(newDate);
-      setDueDate(newDate); // Set due date to be the same as invoice date
-    }
-  };
 
   const handleAmountChange = (index: number, value: string) => {
     const newCompanies = [...companies];
@@ -136,137 +109,20 @@ const BulkInvoicesPage: React.FC = () => {
       </div>
 
       <div className="grid gap-6">
-        <div className="space-y-4 p-6 bg-white rounded-lg border shadow-sm">
-          <h2 className="text-xl font-semibold">Invoice Details</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="invoice-date">Invoice Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="invoice-date"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={handleDateChange}
-                    initialFocus
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="due-date">Due Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    id="due-date"
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !dueDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dueDate}
-                    onSelect={(date) => date && setDueDate(date)}
-                    initialFocus
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                placeholder="Enter service or product description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="resize-none h-[80px]"
-              />
-            </div>
-          </div>
-        </div>
+        <InvoiceDetailsForm 
+          date={date}
+          setDate={setDate}
+          dueDate={dueDate}
+          setDueDate={setDueDate}
+          description={description}
+          setDescription={setDescription}
+        />
 
-        <div className="space-y-4 p-6 bg-white rounded-lg border shadow-sm">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Company Amounts</h2>
-          </div>
-
-          <div className="border rounded-md overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-1/2">Company</TableHead>
-                    <TableHead className="w-1/2">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {companies.length > 0 ? (
-                    companies.map((company, index) => (
-                      <TableRow key={company.template.id}>
-                        <TableCell className="font-medium">
-                          {company.template.name}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center">
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={company.amount}
-                              onChange={(e) => handleAmountChange(index, e.target.value)}
-                              placeholder="0.00"
-                              className="w-full md:w-32"
-                            />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-center py-10">
-                        No company templates available. Create templates first.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
-          <div className="flex justify-end mt-4">
-            <Button
-              onClick={handleGenerateInvoices}
-              className="bg-invoice-blue hover:bg-invoice-darkBlue w-full md:w-auto"
-              disabled={companies.length === 0}
-            >
-              Bulk Generate Invoices
-            </Button>
-          </div>
-        </div>
+        <CompanyAmountsTable 
+          companies={companies}
+          onAmountChange={handleAmountChange}
+          onGenerateInvoices={handleGenerateInvoices}
+        />
       </div>
     </div>
   );
