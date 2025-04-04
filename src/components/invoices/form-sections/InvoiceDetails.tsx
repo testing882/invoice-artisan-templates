@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
@@ -25,7 +24,8 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
   useEffect(() => {
     // Set the company ID in the form
     form.setValue('companyId', 'your-company');
-  }, [form]);
+    console.log('Company info from context:', companyInfo);
+  }, [form, companyInfo]);
 
   return (
     <div>
@@ -135,10 +135,15 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
             <div className="text-sm text-gray-500">Loading company details...</div>
           ) : (
             <div className="text-sm text-gray-500">
-              <p>{companyInfo.name || 'Company name not set'}</p>
-              <p>{companyInfo.street || ''}{companyInfo.street ? ', ' : ''}{companyInfo.city || ''}</p>
-              <p>{companyInfo.zipCode || ''}{companyInfo.zipCode ? ', ' : ''}{companyInfo.country || ''}</p>
-              <p>{companyInfo.email || ''}</p>
+              <p className="font-medium">{companyInfo.name || 'Company name not set'}</p>
+              {companyInfo.street && <p>{companyInfo.street}</p>}
+              <p>
+                {companyInfo.city || ''}
+                {companyInfo.city && companyInfo.zipCode ? ', ' : ''}
+                {companyInfo.zipCode || ''}
+              </p>
+              {companyInfo.country && <p>{companyInfo.country}</p>}
+              {companyInfo.email && <p className="mt-1">{companyInfo.email}</p>}
             </div>
           )}
         </CardContent>

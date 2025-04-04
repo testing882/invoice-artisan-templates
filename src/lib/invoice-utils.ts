@@ -1,12 +1,8 @@
-
 import { Invoice, InvoiceItem } from '@/types/invoice';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import JSZip from 'jszip';
-
-// By importing autotable separately, it will automatically extend jsPDF's prototype
-// So we don't need to declare the module extension
 
 export const calculateItemAmount = (item: InvoiceItem): number => {
   return item.quantity * item.rate;
@@ -48,23 +44,67 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   doc.text(`Date: ${format(invoice.date, 'MMM dd, yyyy')}`, 14, 42);
   doc.text(`Due Date: ${format(invoice.dueDate, 'MMM dd, yyyy')}`, 14, 49);
   
-  // Company info
+  // Company info - ensure all fields are correctly handled
   doc.setFontSize(12);
   doc.text('From:', 14, 66);
   doc.setFontSize(10);
-  doc.text(invoice.company.name, 14, 73);
-  doc.text(invoice.company.address, 14, 80);
-  doc.text(`${invoice.company.city}, ${invoice.company.postalCode}`, 14, 87);
-  doc.text(invoice.company.country, 14, 94);
+  
+  // Always ensure company name is displayed, even if empty
+  doc.text(invoice.company.name || '', 14, 73);
+  
+  // Only add address if it exists
+  if (invoice.company.address) {
+    doc.text(invoice.company.address, 14, 80);
+  }
+  
+  // Handle city and postal code carefully
+  let cityPostalLine = '';
+  if (invoice.company.city) {
+    cityPostalLine += invoice.company.city;
+    if (invoice.company.postalCode) {
+      cityPostalLine += `, ${invoice.company.postalCode}`;
+    }
+  } else if (invoice.company.postalCode) {
+    cityPostalLine = invoice.company.postalCode;
+  }
+  
+  if (cityPostalLine) {
+    doc.text(cityPostalLine, 14, 87);
+  }
+  
+  // Only add country if it exists
+  if (invoice.company.country) {
+    doc.text(invoice.company.country, 14, 94);
+  }
   
   // Client info
   doc.setFontSize(12);
   doc.text('Bill To:', 120, 66);
   doc.setFontSize(10);
-  doc.text(invoice.client.name, 120, 73);
-  doc.text(invoice.client.address, 120, 80);
-  doc.text(`${invoice.client.city}, ${invoice.client.postalCode}`, 120, 87);
-  doc.text(invoice.client.country, 120, 94);
+  doc.text(invoice.client.name || '', 120, 73);
+  
+  if (invoice.client.address) {
+    doc.text(invoice.client.address, 120, 80);
+  }
+  
+  // Handle city and postal code carefully for client
+  let clientCityPostalLine = '';
+  if (invoice.client.city) {
+    clientCityPostalLine += invoice.client.city;
+    if (invoice.client.postalCode) {
+      clientCityPostalLine += `, ${invoice.client.postalCode}`;
+    }
+  } else if (invoice.client.postalCode) {
+    clientCityPostalLine = invoice.client.postalCode;
+  }
+  
+  if (clientCityPostalLine) {
+    doc.text(clientCityPostalLine, 120, 87);
+  }
+  
+  if (invoice.client.country) {
+    doc.text(invoice.client.country, 120, 94);
+  }
   
   // Invoice items
   const tableColumn = ["Description", "Qty", "Rate", "Amount"];

@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
@@ -37,10 +36,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
     });
   };
 
-  // Add useEffect to update the amount value whenever quantity or rate changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
-      // Only process changes related to quantity or rate fields
       if (name && (name.includes('.quantity') || name.includes('.rate'))) {
         const fieldIndex = parseInt(name.split('.')[1]);
         
@@ -50,7 +47,6 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
           const rate = Number(item.rate) || 0;
           const newAmount = quantity * rate;
           
-          // Update the amount field - use type assertion to avoid type conflicts
           form.setValue(`items.${fieldIndex}.amount`, newAmount as any, { 
             shouldValidate: false 
           });
@@ -58,7 +54,6 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
       }
     });
     
-    // Clean up subscription when component unmounts
     return () => subscription.unsubscribe();
   }, [form]);
 
@@ -118,11 +113,9 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                             {...field} 
                             onChange={(e) => {
                               field.onChange(e);
-                              // Manually calculate and update amount when quantity changes
                               const quantity = parseFloat(e.target.value) || 0;
                               const rate = parseFloat(form.getValues(`items.${index}.rate`)) || 0;
                               const amount = quantity * rate;
-                              // Use type assertion to handle type mismatch
                               form.setValue(`items.${index}.amount`, amount as any);
                             }}
                           />
@@ -146,11 +139,9 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                             {...field} 
                             onChange={(e) => {
                               field.onChange(e);
-                              // Manually calculate and update amount when rate changes
                               const rate = parseFloat(e.target.value) || 0;
                               const quantity = parseFloat(form.getValues(`items.${index}.quantity`)) || 0;
                               const amount = quantity * rate;
-                              // Use type assertion to handle type mismatch
                               form.setValue(`items.${index}.amount`, amount as any);
                             }}
                           />

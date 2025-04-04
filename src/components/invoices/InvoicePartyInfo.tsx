@@ -19,11 +19,11 @@ const InvoicePartyInfo: React.FC<InvoicePartyInfoProps> = ({
       <div className="space-y-1">
         <p className="font-bold text-lg">{company.name || ''}</p>
         {company.address && <p>{company.address}</p>}
-        <p>
-          {company.city || ''}
-          {company.city && company.postalCode ? ', ' : ''}
-          {company.postalCode || ''}
-        </p>
+        {company.city && company.postalCode && (
+          <p>
+            {company.city}{company.postalCode ? `, ${company.postalCode}` : ''}
+          </p>
+        )}
         {company.country && <p>{company.country}</p>}
         {company.email && <p className="mt-2">{company.email}</p>}
         {company.phone && <p>{company.phone}</p>}
@@ -41,11 +41,11 @@ const InvoicePartyInfo: React.FC<InvoicePartyInfoProps> = ({
       <div className="space-y-1">
         <p className="font-bold text-lg">{client.name || ''}</p>
         {client.address && <p>{client.address}</p>}
-        <p>
-          {client.city || ''}
-          {client.city && client.postalCode ? ', ' : ''}
-          {client.postalCode || ''}
-        </p>
+        {client.city && client.postalCode && (
+          <p>
+            {client.city}{client.postalCode ? `, ${client.postalCode}` : ''}
+          </p>
+        )}
         {client.country && <p>{client.country}</p>}
       </div>
     );
