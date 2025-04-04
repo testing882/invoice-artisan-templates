@@ -95,7 +95,7 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
                 axisLine={false}
                 tick={{ fill: '#888888' }}
               />
-              <ChartTooltip
+              <Tooltip 
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
