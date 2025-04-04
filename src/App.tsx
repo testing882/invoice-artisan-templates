@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { InvoiceProvider as InvoicesProvider } from './context/InvoiceContext';
 import { TemplatesProvider } from './context/TemplatesContext';
 import { AuthProvider } from './context/AuthContext';
+import { CompanyProvider } from './context/CompanyContext';
 import { MainLayout } from './components/layout/MainLayout';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 
@@ -28,39 +29,41 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
-        <TemplatesProvider>
-          <InvoicesProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                {/* Public route */}
-                <Route path="/auth" element={<Auth />} />
-                
-                {/* Protected routes */}
-                <Route element={<ProtectedRoute />}>
-                  <Route element={
-                    <MainLayout>
-                      <Outlet />
-                    </MainLayout>
-                  }>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/templates" element={<Templates />} />
-                    <Route path="/templates/:id" element={<TemplateEditor />} />
-                    <Route path="/create-invoice" element={<InvoiceEditor />} />
-                    <Route path="/create-invoice/:id" element={<InvoiceEditor />} />
-                    <Route path="/invoice/:id" element={<InvoiceView />} />
-                    <Route path="/export" element={<Export />} />
-                    <Route path="/company" element={<CompanyPage />} />
-                    <Route path="/bulk-invoices" element={<BulkInvoicesPage />} />
+        <CompanyProvider>
+          <TemplatesProvider>
+            <InvoicesProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                  {/* Public route */}
+                  <Route path="/auth" element={<Auth />} />
+                  
+                  {/* Protected routes */}
+                  <Route element={<ProtectedRoute />}>
+                    <Route element={
+                      <MainLayout>
+                        <Outlet />
+                      </MainLayout>
+                    }>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/templates" element={<Templates />} />
+                      <Route path="/templates/:id" element={<TemplateEditor />} />
+                      <Route path="/create-invoice" element={<InvoiceEditor />} />
+                      <Route path="/create-invoice/:id" element={<InvoiceEditor />} />
+                      <Route path="/invoice/:id" element={<InvoiceView />} />
+                      <Route path="/export" element={<Export />} />
+                      <Route path="/company" element={<CompanyPage />} />
+                      <Route path="/bulk-invoices" element={<BulkInvoicesPage />} />
+                    </Route>
                   </Route>
-                </Route>
-                
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </TooltipProvider>
-          </InvoicesProvider>
-        </TemplatesProvider>
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </TooltipProvider>
+            </InvoicesProvider>
+          </TemplatesProvider>
+        </CompanyProvider>
       </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>

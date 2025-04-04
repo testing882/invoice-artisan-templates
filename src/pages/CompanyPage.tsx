@@ -5,19 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-
-const COMPANY_STORAGE_KEY = 'invoiceArtisan_company';
-
-interface CompanyInfo {
-  name: string;
-  street: string;
-  city: string;
-  zipCode: string;
-  country: string;
-  email: string;
-}
+import { useCompanyData } from '@/hooks/useCompanyData';
+import { LoaderCircle } from 'lucide-react';
+import { CompanyInfo } from '@/types/invoice';
 
 const CompanyPage: React.FC = () => {
+  const { companyInfo: initialCompany, saveCompany, loading } = useCompanyData();
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
     name: '',
     street: '',
@@ -28,28 +21,10 @@ const CompanyPage: React.FC = () => {
   });
 
   useEffect(() => {
-    // Load existing values from localStorage
-    try {
-      const savedCompany = localStorage.getItem(COMPANY_STORAGE_KEY);
-      if (savedCompany) {
-        const parsedCompany = JSON.parse(savedCompany);
-        setCompanyInfo(parsedCompany);
-      } else {
-        // If no saved data, check for individual fields (backward compatibility)
-        setCompanyInfo({
-          name: localStorage.getItem('company_name') || '',
-          street: localStorage.getItem('company_street') || '',
-          city: localStorage.getItem('company_city') || '',
-          zipCode: localStorage.getItem('company_zipCode') || '',
-          country: localStorage.getItem('company_country') || '',
-          email: localStorage.getItem('company_email') || '',
-        });
-      }
-    } catch (error) {
-      console.error('Error loading company info:', error);
-      toast.error('Failed to load company information');
+    if (initialCompany) {
+      setCompanyInfo(initialCompany);
     }
-  }, []);
+  }, [initialCompany]);
 
   const handleChange = (field: keyof CompanyInfo) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyInfo(prev => ({
@@ -58,25 +33,18 @@ const CompanyPage: React.FC = () => {
     }));
   };
 
-  const handleSave = () => {
-    try {
-      // Save as a single JSON object
-      localStorage.setItem(COMPANY_STORAGE_KEY, JSON.stringify(companyInfo));
-      
-      // Also save individual fields for backward compatibility
-      localStorage.setItem('company_name', companyInfo.name);
-      localStorage.setItem('company_street', companyInfo.street);
-      localStorage.setItem('company_city', companyInfo.city);
-      localStorage.setItem('company_zipCode', companyInfo.zipCode);
-      localStorage.setItem('company_country', companyInfo.country);
-      localStorage.setItem('company_email', companyInfo.email);
-      
-      toast.success('Company information saved successfully');
-    } catch (error) {
-      console.error('Error saving company info:', error);
-      toast.error('Failed to save company information');
-    }
+  const handleSave = async () => {
+    await saveCompany(companyInfo);
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <LoaderCircle className="w-10 h-10 text-invoice-blue animate-spin" />
+        <p className="text-invoice-gray">Loading company details...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -8,50 +8,21 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CompanyTemplate } from '@/types/invoice';
+import { CompanyInfo, CompanyTemplate } from '@/types/invoice';
 import { UseFormReturn } from 'react-hook-form';
 import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
 import { Card, CardContent } from '@/components/ui/card';
+import { useCompanyData } from '@/hooks/useCompanyData';
 
 interface InvoiceDetailsProps {
   form: UseFormReturn<InvoiceFormValues>;
   templates: CompanyTemplate[];
 }
 
-const COMPANY_STORAGE_KEY = 'invoiceArtisan_company';
-
 const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
-  const [companyInfo, setCompanyInfo] = useState({
-    name: '',
-    street: '',
-    city: '',
-    zipCode: '',
-    country: '',
-    email: '',
-  });
+  const { companyInfo, loading } = useCompanyData();
   
   useEffect(() => {
-    // Load company info
-    try {
-      const savedCompany = localStorage.getItem(COMPANY_STORAGE_KEY);
-      if (savedCompany) {
-        const parsedCompany = JSON.parse(savedCompany);
-        setCompanyInfo(parsedCompany);
-      } else {
-        // Fallback to individual fields
-        setCompanyInfo({
-          name: localStorage.getItem('company_name') || 'Your Company',
-          street: localStorage.getItem('company_street') || '',
-          city: localStorage.getItem('company_city') || '',
-          zipCode: localStorage.getItem('company_zipCode') || '',
-          country: localStorage.getItem('company_country') || '',
-          email: localStorage.getItem('company_email') || '',
-        });
-      }
-    } catch (error) {
-      console.error('Error loading company info in InvoiceDetails:', error);
-    }
-    
     // Set the company ID in the form
     form.setValue('companyId', 'your-company');
   }, [form]);
@@ -160,12 +131,16 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
             <Building2 className="h-5 w-5 text-invoice-blue" />
             <h3 className="text-sm font-semibold">Your Company</h3>
           </div>
-          <div className="text-sm text-gray-500">
-            <p>{companyInfo.name || 'Company name not set'}</p>
-            <p>{companyInfo.street || ''}{companyInfo.street ? ', ' : ''}{companyInfo.city || ''}</p>
-            <p>{companyInfo.zipCode || ''}{companyInfo.zipCode ? ', ' : ''}{companyInfo.country || ''}</p>
-            <p>{companyInfo.email || ''}</p>
-          </div>
+          {loading ? (
+            <div className="text-sm text-gray-500">Loading company details...</div>
+          ) : (
+            <div className="text-sm text-gray-500">
+              <p>{companyInfo.name || 'Company name not set'}</p>
+              <p>{companyInfo.street || ''}{companyInfo.street ? ', ' : ''}{companyInfo.city || ''}</p>
+              <p>{companyInfo.zipCode || ''}{companyInfo.zipCode ? ', ' : ''}{companyInfo.country || ''}</p>
+              <p>{companyInfo.email || ''}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

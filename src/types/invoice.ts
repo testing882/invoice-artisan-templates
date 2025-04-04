@@ -30,6 +30,15 @@ export interface ClientInfo {
   country: string;
 }
 
+export interface CompanyInfo {
+  name: string;
+  street: string;
+  city: string;
+  zipCode: string;
+  country: string;
+  email: string;
+}
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;
