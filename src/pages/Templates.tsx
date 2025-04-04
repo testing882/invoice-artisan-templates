@@ -10,7 +10,7 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, FileText, Trash, AlertCircle } from 'lucide-react';
+import { Plus, FileText, Trash, AlertCircle, LoaderCircle } from 'lucide-react';
 import { useTemplates } from '@/context/TemplatesContext';
 import {
   AlertDialog,
@@ -24,13 +24,13 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const Templates: React.FC = () => {
-  const { templates, deleteTemplate } = useTemplates();
+  const { templates, deleteTemplate, loading, error } = useTemplates();
   const navigate = useNavigate();
   const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
   
-  const handleDeleteTemplate = () => {
+  const handleDeleteTemplate = async () => {
     if (templateToDelete) {
-      deleteTemplate(templateToDelete);
+      await deleteTemplate(templateToDelete);
       setTemplateToDelete(null);
     }
   };
@@ -38,6 +38,27 @@ const Templates: React.FC = () => {
   // Log the templates to help with debugging
   console.log('Current templates:', templates);
   
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <LoaderCircle className="w-10 h-10 text-invoice-blue animate-spin" />
+        <p className="text-invoice-gray">Loading templates...</p>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <AlertCircle className="w-10 h-10 text-red-500" />
+        <p className="text-red-500">{error}</p>
+        <Button onClick={() => window.location.reload()}>
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

@@ -3,18 +3,21 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CompanyTemplate } from '@/types/invoice';
 import { toast } from 'sonner';
 import { STORAGE_KEYS } from './types';
+import { supabase, mapTemplateFromSupabase, mapTemplateToSupabase, getCurrentUserId } from '@/lib/supabase';
 
 interface TemplatesContextType {
   templates: CompanyTemplate[];
-  addTemplate: (template: CompanyTemplate) => void;
-  updateTemplate: (template: CompanyTemplate) => void;
-  deleteTemplate: (id: string) => void;
+  addTemplate: (template: CompanyTemplate) => Promise<void>;
+  updateTemplate: (template: CompanyTemplate) => Promise<void>;
+  deleteTemplate: (id: string) => Promise<void>;
   getTemplateById: (id: string) => CompanyTemplate | undefined;
+  loading: boolean;
+  error: string | null;
 }
 
 const TemplatesContext = createContext<TemplatesContextType | undefined>(undefined);
 
-// Sample template data
+// Sample template data (fallback if database is empty)
 const sampleTemplates: CompanyTemplate[] = [
   {
     id: '1',
@@ -56,77 +59,157 @@ const sampleTemplates: CompanyTemplate[] = [
 
 export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [templates, setTemplates] = useState<CompanyTemplate[]>([]);
-  const [initialized, setInitialized] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load saved templates from localStorage on initial render
+  // Load templates from Supabase on initial render
   useEffect(() => {
-    try {
-      console.log('Loading templates from localStorage');
-      const savedTemplates = localStorage.getItem(STORAGE_KEYS.TEMPLATES_STORAGE_KEY);
-      
-      console.log('Saved templates:', savedTemplates);
-      
-      if (savedTemplates) {
-        try {
-          const parsed = JSON.parse(savedTemplates);
-          console.log('Parsed templates:', parsed);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setTemplates(parsed);
-            setInitialized(true);
-          } else {
-            console.log('Saved templates is empty or invalid, using samples');
-            setTemplates(sampleTemplates);
-            setInitialized(true);
-          }
-        } catch (parseError) {
-          console.error('Error parsing templates:', parseError);
-          setTemplates(sampleTemplates);
-          setInitialized(true);
+    const fetchTemplates = async () => {
+      try {
+        setLoading(true);
+        console.log('Fetching templates from Supabase');
+        
+        // Get current user ID
+        const userId = await getCurrentUserId();
+        
+        // Fetch templates for the current user
+        const { data, error } = await supabase
+          .from('templates')
+          .select('*')
+          .eq('user_id', userId);
+        
+        if (error) {
+          throw error;
         }
-      } else {
-        console.log('No saved templates found, using samples');
+        
+        console.log('Fetched templates:', data);
+        
+        if (data && data.length > 0) {
+          // Map templates from Supabase format to application format
+          const mappedTemplates = data.map(mapTemplateFromSupabase);
+          setTemplates(mappedTemplates);
+        } else {
+          // If no templates found, initialize with sample templates
+          // Only do this on first load for new users
+          console.log('No templates found, initializing with samples');
+          
+          // For new users, add sample templates to Supabase
+          if (userId) {
+            for (const template of sampleTemplates) {
+              const supabaseTemplate = mapTemplateToSupabase(template);
+              await supabase
+                .from('templates')
+                .insert({
+                  ...supabaseTemplate,
+                  user_id: userId
+                });
+            }
+          }
+          
+          setTemplates(sampleTemplates);
+        }
+      } catch (err) {
+        console.error('Error loading templates:', err);
+        setError('Failed to load templates');
+        toast.error('Failed to load templates');
+        
+        // Fallback to sample data if there's an error
         setTemplates(sampleTemplates);
-        setInitialized(true);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading saved templates:', error);
-      toast.error('Failed to load saved templates');
-      
-      // Fallback to sample data if there's an error
-      setTemplates(sampleTemplates);
-      setInitialized(true);
-    }
+    };
+
+    fetchTemplates();
   }, []);
 
-  // Save to localStorage whenever templates change, but only after initial load
-  useEffect(() => {
-    if (!initialized) return;
-    
+  const addTemplate = async (template: CompanyTemplate) => {
     try {
-      console.log('Saving templates to localStorage:', templates);
-      localStorage.setItem(STORAGE_KEYS.TEMPLATES_STORAGE_KEY, JSON.stringify(templates));
-    } catch (error) {
-      console.error('Error saving templates:', error);
-      toast.error('Failed to save templates');
+      console.log('Adding template:', template);
+      setLoading(true);
+      
+      // Get current user ID
+      const userId = await getCurrentUserId();
+      
+      // Map template to Supabase format
+      const supabaseTemplate = mapTemplateToSupabase(template);
+      
+      // Insert template into Supabase
+      const { error } = await supabase
+        .from('templates')
+        .insert({
+          ...supabaseTemplate,
+          user_id: userId
+        });
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Update local state
+      setTemplates((prev) => [...prev, template]);
+      toast.success('Template created successfully');
+    } catch (err) {
+      console.error('Error adding template:', err);
+      toast.error('Failed to create template');
+    } finally {
+      setLoading(false);
     }
-  }, [templates, initialized]);
-
-  const addTemplate = (template: CompanyTemplate) => {
-    console.log('Adding template:', template);
-    setTemplates((prev) => [...prev, template]);
-    toast.success('Template created successfully');
   };
 
-  const updateTemplate = (template: CompanyTemplate) => {
-    console.log('Updating template:', template);
-    setTemplates((prev) => prev.map((temp) => (temp.id === template.id ? template : temp)));
-    toast.success('Template updated successfully');
+  const updateTemplate = async (template: CompanyTemplate) => {
+    try {
+      console.log('Updating template:', template);
+      setLoading(true);
+      
+      // Map template to Supabase format
+      const supabaseTemplate = mapTemplateToSupabase(template);
+      
+      // Update template in Supabase
+      const { error } = await supabase
+        .from('templates')
+        .update(supabaseTemplate)
+        .eq('id', template.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Update local state
+      setTemplates((prev) => prev.map((temp) => (temp.id === template.id ? template : temp)));
+      toast.success('Template updated successfully');
+    } catch (err) {
+      console.error('Error updating template:', err);
+      toast.error('Failed to update template');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteTemplate = (id: string) => {
-    console.log('Deleting template:', id);
-    setTemplates((prev) => prev.filter((template) => template.id !== id));
-    toast.success('Template deleted successfully');
+  const deleteTemplate = async (id: string) => {
+    try {
+      console.log('Deleting template:', id);
+      setLoading(true);
+      
+      // Delete template from Supabase
+      const { error } = await supabase
+        .from('templates')
+        .delete()
+        .eq('id', id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Update local state
+      setTemplates((prev) => prev.filter((template) => template.id !== id));
+      toast.success('Template deleted successfully');
+    } catch (err) {
+      console.error('Error deleting template:', err);
+      toast.error('Failed to delete template');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getTemplateById = (id: string) => {
@@ -141,6 +224,8 @@ export const TemplatesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         updateTemplate,
         deleteTemplate,
         getTemplateById,
+        loading,
+        error,
       }}
     >
       {children}
