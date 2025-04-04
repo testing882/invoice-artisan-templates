@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const Auth: React.FC = () => {
-  const { signIn, signUp, user, loading } = useAuth();
+  const { signIn, signUp, user, loading, resetPassword } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -69,7 +69,8 @@ const Auth: React.FC = () => {
     setResetInProgress(true);
     
     try {
-      const { error } = await useAuth().resetPassword(resetEmail);
+      // Use the resetPassword from the useAuth hook instead of calling useAuth() directly
+      const { error } = await resetPassword(resetEmail);
       if (error) {
         toast.error(error.message || 'Failed to send reset password email');
       } else {
