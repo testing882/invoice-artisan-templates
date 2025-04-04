@@ -13,18 +13,20 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const Auth: React.FC = () => {
-  const { signIn, signUp, user, loading, resetPassword } = useAuth();
+  const { signIn, signUp, user, loading, resetPassword, updatePassword, isPasswordRecovery } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [activeTab, setActiveTab] = useState('login');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetInProgress, setResetInProgress] = useState(false);
 
-  // If user is already logged in, redirect to home
-  if (user && !loading) {
+  // If user is already logged in and not in password recovery mode, redirect to home
+  if (user && !loading && !isPasswordRecovery) {
     return <Navigate to="/" replace />;
   }
 
@@ -69,7 +71,6 @@ const Auth: React.FC = () => {
     setResetInProgress(true);
     
     try {
-      // Use the resetPassword from the useAuth hook instead of calling useAuth() directly
       const { error } = await resetPassword(resetEmail);
       if (error) {
         toast.error(error.message || 'Failed to send reset password email');
@@ -85,10 +86,92 @@ const Auth: React.FC = () => {
     }
   };
 
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (newPassword !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const { error } = await updatePassword(newPassword);
+      if (error) {
+        toast.error(error.message || 'Failed to update password');
+      } else {
+        toast.success('Password updated successfully! You can now log in with your new password.');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <LoaderCircle className="animate-spin h-8 w-8 text-invoice-blue" />
+      </div>
+    );
+  }
+
+  if (isPasswordRecovery) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-center">Reset Your Password</CardTitle>
+            <CardDescription className="text-center">
+              Please enter a new password for your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleUpdatePassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input 
+                  id="new-password" 
+                  type="password" 
+                  placeholder="Enter your new password"
+                  required 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Input 
+                  id="confirm-password" 
+                  type="password" 
+                  placeholder="Confirm your new password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-invoice-blue hover:bg-invoice-darkBlue"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Update Password
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     );
   }

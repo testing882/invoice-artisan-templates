@@ -11,7 +11,9 @@ interface AuthContextProps {
   signUp: (email: string, password: string) => Promise<{ error: any | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: any | null }>;
+  updatePassword: (newPassword: string) => Promise<{ error: any | null }>;
   loading: boolean;
+  isPasswordRecovery: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -20,14 +22,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if URL contains a hash with access_token and type=recovery
+    const checkPasswordRecovery = () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes('type=recovery')) {
+        setIsPasswordRecovery(true);
+        // Remove the hash to prevent it from being processed again on refresh
+        window.history.replaceState(null, '', window.location.pathname);
+        navigate('/auth');
+      }
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, newSession) => {
+        console.log('Auth state change event:', event);
         setSession(newSession);
         setUser(newSession?.user ?? null);
+        
+        // Only navigate to home if it's not a password recovery event
+        if (event === 'SIGNED_IN' && !isPasswordRecovery) {
+          navigate('/');
+        }
+        
         setLoading(false);
       }
     );
@@ -39,8 +60,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
+    // Check for password recovery
+    checkPasswordRecovery();
+
     return () => subscription.unsubscribe();
-  }, []);
+  }, [navigate, isPasswordRecovery]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -84,6 +108,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updatePassword = async (newPassword: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (!error) {
+        setIsPasswordRecovery(false);
+      }
+      
+      return { error };
+    } catch (error) {
+      return { error };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     navigate('/auth');
@@ -97,7 +137,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signUp, 
       signOut, 
       resetPassword,
-      loading 
+      updatePassword,
+      loading,
+      isPasswordRecovery
     }}>
       {children}
     </AuthContext.Provider>
