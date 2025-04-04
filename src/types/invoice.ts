@@ -1,4 +1,3 @@
-
 export interface InvoiceItem {
   id: string;
   description: string;
@@ -20,6 +19,7 @@ export interface CompanyTemplate {
   taxId?: string;
   description?: string;
   isEU?: boolean;
+  notes?: string;
 }
 
 export interface ClientInfo {

@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { CompanyTemplate } from '@/types/invoice';
 
 const templateSchema = z.object({
@@ -27,6 +28,7 @@ const templateSchema = z.object({
   taxId: z.string().optional().or(z.literal('')),
   description: z.string().optional().or(z.literal('')),
   logo: z.string().optional().or(z.literal('')),
+  notes: z.string().optional().or(z.literal('')),
   isEU: z.boolean().default(false),
 });
 
@@ -53,6 +55,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       taxId: initialData.taxId || '',
       description: initialData.description || '',
       logo: initialData.logo || '',
+      notes: initialData.notes || '',
       isEU: initialData.isEU || false,
     } : {
       name: '',
@@ -65,6 +68,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       taxId: '',
       description: '',
       logo: '',
+      notes: '',
       isEU: false,
     },
   });
@@ -84,6 +88,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       taxId: values.taxId || '',
       logo: values.logo || '',
       description: values.description || '',
+      notes: values.notes || '',
       isEU: values.isEU || false,
     };
     
@@ -179,6 +184,25 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
             )}
           />
         </div>
+        
+        {/* Notes field - added for payment instructions */}
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Notes (Optional)</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Payment instructions or additional information to display on invoices" 
+                  className="min-h-[100px]" 
+                  {...field} 
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
         <FormField
           control={form.control}
