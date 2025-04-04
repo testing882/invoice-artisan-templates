@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, FileText, Trash, AlertCircle } from 'lucide-react';
-import { useInvoice } from '@/context/InvoiceContext';
+import { useTemplates } from '@/context/TemplatesContext';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const Templates: React.FC = () => {
-  const { templates, deleteTemplate } = useInvoice();
+  const { templates, deleteTemplate } = useTemplates();
   const navigate = useNavigate();
   const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
   

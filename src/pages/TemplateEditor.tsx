@@ -2,7 +2,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInvoice } from '@/context/InvoiceContext';
+import { useTemplates } from '@/context/TemplatesContext';
 import TemplateForm from '@/components/templates/TemplateForm';
 import { CompanyTemplate } from '@/types/invoice';
 import { toast } from 'sonner';
@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 const TemplateEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { templates, addTemplate, updateTemplate, getTemplateById } = useInvoice();
+  const { templates, addTemplate, updateTemplate, getTemplateById } = useTemplates();
   
   const isNewTemplate = id === 'new';
   const template = !isNewTemplate ? getTemplateById(id!) : undefined;

@@ -1,16 +1,16 @@
-
 import React, { useState } from 'react';
 import { isWithinInterval } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
-import { useInvoice } from '@/context/InvoiceContext';
+import { useInvoices } from '@/context/InvoicesContext';
 import { exportToPdf } from '@/lib/invoice-utils';
 import { toast } from 'sonner';
 import FilterSection from '@/components/export/FilterSection';
 import InvoiceTable from '@/components/export/InvoiceTable';
 
 const Export: React.FC = () => {
-  const { invoices } = useInvoice();
+  const { invoices } = useInvoices();
+  
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);

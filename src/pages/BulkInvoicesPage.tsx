@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { format, addDays } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { useInvoice } from '@/context/InvoiceContext';
+import { useInvoices } from '@/context/InvoicesContext';
+import { useTemplates } from '@/context/TemplatesContext';
 import { CalendarIcon, Plus, Trash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,12 +29,12 @@ import { Textarea } from '@/components/ui/textarea';
 
 const BulkInvoicesPage: React.FC = () => {
   const navigate = useNavigate();
-  const { templates, addInvoice } = useInvoice();
+  const { templates } = useTemplates();
+  const { addInvoice } = useInvoices();
   const [date, setDate] = useState<Date>(new Date());
   const [description, setDescription] = useState<string>('');
   const [companies, setCompanies] = useState<{ template: CompanyTemplate; amount: string }[]>([]);
 
-  // Initialize companies from templates
   React.useEffect(() => {
     if (templates.length > 0 && companies.length === 0) {
       setCompanies(
@@ -53,7 +53,6 @@ const BulkInvoicesPage: React.FC = () => {
   };
 
   const handleGenerateInvoices = () => {
-    // Validate inputs
     if (!description.trim()) {
       toast.error('Please enter a description for the invoices');
       return;
@@ -68,13 +67,11 @@ const BulkInvoicesPage: React.FC = () => {
       return;
     }
 
-    // Generate invoices
     let generatedCount = 0;
 
     validCompanies.forEach((company) => {
       const amount = parseFloat(company.amount);
       
-      // Create invoice for each company with valid amount
       const invoiceItem = {
         id: crypto.randomUUID(),
         description: description,
@@ -83,7 +80,6 @@ const BulkInvoicesPage: React.FC = () => {
         amount: amount,
       };
 
-      // Get your company details from localStorage
       const yourCompany: CompanyTemplate = {
         id: "your-company",
         name: localStorage.getItem('company_name') || 'Your Company',

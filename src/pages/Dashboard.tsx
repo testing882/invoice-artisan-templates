@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Plus, Download } from 'lucide-react';
-import { useInvoice } from '@/context/InvoiceContext';
+import { useInvoices } from '@/context/InvoicesContext';
+import { useTemplates } from '@/context/TemplatesContext';
 import { formatCurrency } from '@/lib/invoice-utils';
 import { format } from 'date-fns';
 
 const Dashboard: React.FC = () => {
-  const { invoices, templates } = useInvoice();
+  const { invoices } = useInvoices();
+  const { templates } = useTemplates();
   const navigate = useNavigate();
   
   const recentInvoices = invoices.slice(0, 5);

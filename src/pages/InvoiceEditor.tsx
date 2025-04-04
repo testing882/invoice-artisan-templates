@@ -2,7 +2,7 @@
 import React from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useInvoice } from '@/context/InvoiceContext';
+import { useInvoices } from '@/context/InvoicesContext';
 import InvoiceForm from '@/components/invoices/InvoiceForm';
 import { Invoice } from '@/types/invoice';
 import { toast } from 'sonner';
@@ -12,7 +12,7 @@ const InvoiceEditor: React.FC = () => {
   const [searchParams] = useSearchParams();
   const templateId = searchParams.get('template');
   const navigate = useNavigate();
-  const { addInvoice, updateInvoice, getInvoiceById } = useInvoice();
+  const { addInvoice, updateInvoice, getInvoiceById } = useInvoices();
   
   const isNewInvoice = !id || id === 'new';
   const invoice = !isNewInvoice ? getInvoiceById(id) : undefined;

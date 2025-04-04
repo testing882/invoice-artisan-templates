@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useInvoice } from '@/context/InvoiceContext';
+import { useInvoices } from '@/context/InvoicesContext';
 import { formatCurrency, exportToPdf } from '@/lib/invoice-utils';
 import { Pencil, Download, Trash } from 'lucide-react';
 import {
@@ -26,7 +26,7 @@ import { toast } from 'sonner';
 const InvoiceView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getInvoiceById, deleteInvoice } = useInvoice();
+  const { getInvoiceById, deleteInvoice } = useInvoices();
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   
   const invoice = getInvoiceById(id!);
