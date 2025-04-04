@@ -1,14 +1,11 @@
 
 import { Invoice, InvoiceItem } from '@/types/invoice';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
+// By importing autotable separately, it will automatically extend jsPDF's prototype
+// So we don't need to declare the module extension
 
 export const calculateItemAmount = (item: InvoiceItem): number => {
   return item.quantity * item.rate;
@@ -77,8 +74,8 @@ export const exportToPdf = (invoice: Invoice): void => {
     formatCurrency(item.amount)
   ]);
   
-  // Add invoice items table
-  doc.autoTable({
+  // Add invoice items table using autoTable directly
+  autoTable(doc, {
     head: [tableColumn],
     body: tableRows,
     startY: 110,
@@ -94,6 +91,7 @@ export const exportToPdf = (invoice: Invoice): void => {
     },
   });
   
+  // Get the final Y position after the table
   const finalY = (doc as any).lastAutoTable.finalY || 110;
   
   // Add totals

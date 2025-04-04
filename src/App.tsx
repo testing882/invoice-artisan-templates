@@ -18,9 +18,6 @@ import NotFound from "./pages/NotFound";
 import CompanyPage from "./pages/CompanyPage";
 import BulkInvoicesPage from "./pages/BulkInvoicesPage";
 
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-
 const queryClient = new QueryClient();
 
 const App = () => (
