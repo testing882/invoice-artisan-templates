@@ -16,6 +16,7 @@ import InvoiceView from "./pages/InvoiceView";
 import Export from "./pages/Export";
 import NotFound from "./pages/NotFound";
 import CompanyPage from "./pages/CompanyPage";
+import BulkInvoicesPage from "./pages/BulkInvoicesPage";
 
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/invoice/:id" element={<InvoiceView />} />
               <Route path="/export" element={<Export />} />
               <Route path="/company" element={<CompanyPage />} />
+              <Route path="/bulk-invoices" element={<BulkInvoicesPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </MainLayout>
