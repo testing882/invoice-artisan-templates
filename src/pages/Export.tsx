@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import { isWithinInterval } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Download, Trash } from 'lucide-react';
+import { Download, FileArchive, Trash } from 'lucide-react';
 import { useInvoices } from '@/context/InvoicesContext';
-import { exportToPdf } from '@/lib/invoice-utils';
+import { exportToPdf, savePdfDocument, exportInvoicesToZip, generateZipFilename } from '@/lib/invoice-utils';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import FilterSection from '@/components/export/FilterSection';
@@ -76,7 +76,8 @@ const Export: React.FC = () => {
     const invoice = invoices.find(inv => inv.id === id);
     if (invoice) {
       try {
-        exportToPdf(invoice);
+        const pdfDoc = exportToPdf(invoice);
+        savePdfDocument(pdfDoc, `Invoice-${invoice.invoiceNumber}.pdf`);
         toast.success(`Exported ${invoice.invoiceNumber} to PDF`);
       } catch (error) {
         console.error('Error exporting to PDF:', error);
@@ -91,28 +92,26 @@ const Export: React.FC = () => {
       return;
     }
     
-    let successCount = 0;
-    let errorCount = 0;
+    // Get selected invoices
+    const selectedInvoiceObjects = selectedInvoices
+      .map(id => invoices.find(inv => inv.id === id))
+      .filter(invoice => invoice !== undefined) as Invoice[];
     
-    selectedInvoices.forEach(id => {
-      const invoice = invoices.find(inv => inv.id === id);
-      if (invoice) {
-        try {
-          exportToPdf(invoice);
-          successCount++;
-        } catch (error) {
-          console.error(`Error exporting ${invoice.invoiceNumber}:`, error);
-          errorCount++;
-        }
-      }
-    });
-    
-    if (successCount > 0) {
-      toast.success(`Successfully exported ${successCount} invoice(s)`);
+    if (selectedInvoiceObjects.length === 0) {
+      toast.error('No valid invoices found to export');
+      return;
     }
     
-    if (errorCount > 0) {
-      toast.error(`Failed to export ${errorCount} invoice(s)`);
+    // Generate zip filename
+    const zipFilename = generateZipFilename(selectedInvoiceObjects);
+    
+    // Export invoices to zip
+    try {
+      exportInvoicesToZip(selectedInvoiceObjects, zipFilename);
+      toast.success(`Exporting ${selectedInvoiceObjects.length} invoice(s) as ${zipFilename}`);
+    } catch (error) {
+      console.error('Error exporting to zip:', error);
+      toast.error(`Failed to export invoices: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -177,8 +176,8 @@ const Export: React.FC = () => {
             className="bg-invoice-blue hover:bg-invoice-darkBlue"
             disabled={selectedInvoices.length === 0}
           >
-            <Download className="w-4 h-4 mr-2" />
-            Export Selected
+            <FileArchive className="w-4 h-4 mr-2" />
+            Export as ZIP
           </Button>
           <Button 
             onClick={handleBulkDelete}

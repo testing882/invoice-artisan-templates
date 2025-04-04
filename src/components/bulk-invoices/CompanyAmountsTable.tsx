@@ -28,6 +28,11 @@ const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
   onAmountChange,
   onGenerateInvoices,
 }) => {
+  // Sort companies alphabetically by name
+  const sortedCompanies = [...companies].sort((a, b) => 
+    a.template.name.localeCompare(b.template.name)
+  );
+
   return (
     <div className="space-y-4 p-6 bg-white rounded-lg border shadow-sm">
       <div className="flex items-center justify-between">
@@ -44,8 +49,8 @@ const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {companies.length > 0 ? (
-                companies.map((company, index) => (
+              {sortedCompanies.length > 0 ? (
+                sortedCompanies.map((company, index) => (
                   <TableRow key={company.template.id}>
                     <TableCell className="font-medium">
                       {company.template.name}
@@ -57,7 +62,11 @@ const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
                           min="0"
                           step="0.01"
                           value={company.amount}
-                          onChange={(e) => onAmountChange(index, e.target.value)}
+                          onChange={(e) => onAmountChange(
+                            // Find the original index in companies array
+                            companies.findIndex(c => c.template.id === company.template.id),
+                            e.target.value
+                          )}
                           placeholder="0.00"
                           className="w-full md:w-32"
                         />
@@ -81,7 +90,7 @@ const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
         <Button
           onClick={onGenerateInvoices}
           className="bg-invoice-blue hover:bg-invoice-darkBlue w-full md:w-auto"
-          disabled={companies.length === 0}
+          disabled={sortedCompanies.length === 0}
         >
           Bulk Generate Invoices
         </Button>

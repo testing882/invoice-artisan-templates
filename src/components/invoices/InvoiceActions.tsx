@@ -2,6 +2,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Edit, Trash } from 'lucide-react';
+import { exportToPdf, savePdfDocument } from '@/lib/invoice-utils';
+import { Invoice } from '@/types/invoice';
 
 interface InvoiceActionsProps {
   onExportPdf: () => void;

@@ -3,6 +3,7 @@ import { Invoice, InvoiceItem } from '@/types/invoice';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
+import JSZip from 'jszip';
 
 // By importing autotable separately, it will automatically extend jsPDF's prototype
 // So we don't need to declare the module extension
@@ -113,5 +114,78 @@ export const exportToPdf = (invoice: Invoice): void => {
     doc.text(invoice.notes, 14, finalY + 47);
   }
   
-  doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
+  return doc;
 };
+
+export const savePdfDocument = (doc: jsPDF, filename: string): void => {
+  doc.save(filename);
+};
+
+export const getPdfAsBlob = (doc: jsPDF): Promise<Blob> => {
+  return new Promise((resolve) => {
+    const blob = doc.output('blob');
+    resolve(blob);
+  });
+};
+
+export const exportInvoicesToZip = async (
+  invoices: Invoice[],
+  zipFilename: string
+): Promise<void> => {
+  // Create a new JSZip instance
+  const zip = new JSZip();
+  
+  // Process each invoice
+  for (const invoice of invoices) {
+    try {
+      // Generate PDF document
+      const pdfDoc = exportToPdf(invoice);
+      
+      // Get PDF as blob
+      const pdfBlob = await getPdfAsBlob(pdfDoc);
+      
+      // Add PDF to zip
+      zip.file(`Invoice-${invoice.invoiceNumber}.pdf`, pdfBlob);
+    } catch (error) {
+      console.error(`Error adding invoice ${invoice.invoiceNumber} to zip:`, error);
+    }
+  }
+  
+  // Generate and download the zip file
+  zip.generateAsync({ type: 'blob' }).then((blob) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = zipFilename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  });
+};
+
+export const generateZipFilename = (invoices: Invoice[]): string => {
+  // Default name
+  let filename = "Invoices";
+  
+  if (invoices.length > 0) {
+    // Get year and month from the first invoice
+    const year = format(invoices[0].date, 'yyyy');
+    const month = format(invoices[0].date, 'MMMM');
+    
+    // Check if all invoices are for the same client
+    const firstClientName = invoices[0].client.name;
+    const allSameClient = invoices.every(invoice => invoice.client.name === firstClientName);
+    
+    if (allSameClient) {
+      // Format: YEAR_MONTH_CLIENTNAME_Invoices.zip
+      filename = `${year}_${month}_${firstClientName}_Invoices`;
+    } else {
+      // Format: YEAR_MONTH_Invoices.zip
+      filename = `${year}_${month}_Invoices`;
+    }
+  }
+  
+  return `${filename}.zip`;
+};
+
