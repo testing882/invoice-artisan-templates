@@ -9,7 +9,7 @@ import {
   generateInvoiceNumber,
   calculateItemAmount 
 } from '@/lib/invoice-utils';
-import { Invoice, InvoiceItem, CompanyTemplate } from '@/types/invoice';
+import { Invoice, InvoiceItem, CompanyTemplate, ClientInfo } from '@/types/invoice';
 
 // Schema definitions
 const clientSchema = z.object({
@@ -76,13 +76,13 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
     companyId: templateId || (templates.length > 0 ? templates[0].id : ''),
     client: {
-      name: '',
+      name: '',                // Make sure all required properties of ClientInfo are present
       address: '',
       city: '',
       postalCode: '',
       country: '',
       email: '',
-    },
+    } as ClientInfo,           // Explicit type casting to ensure TypeScript recognizes it as ClientInfo
     items: [createEmptyItem()],
     notes: '',
     terms: '',
