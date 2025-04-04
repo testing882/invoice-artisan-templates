@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -108,7 +107,9 @@ interface UseInvoiceFormProps {
 
 export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoiceFormProps) => {
   // Find selected template if templateId is provided
-  const selectedTemplate = templateId ? templates.find(t => t.id === templateId) : undefined;
+  const selectedTemplate = templateId 
+    ? templates.find(t => t.id === templateId) 
+    : undefined;
   
   // Set default values based on initial data, selected template, or create new ones
   const defaultValues = initialData ? {
@@ -125,7 +126,13 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     date: new Date(),
     dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
     companyId: selectedTemplate?.id || "your-company",
-    client: {
+    client: selectedTemplate ? {
+      name: selectedTemplate.name,
+      address: selectedTemplate.address,
+      city: selectedTemplate.city,
+      postalCode: selectedTemplate.postalCode,
+      country: selectedTemplate.country,
+    } : {
       name: '',
       address: '',
       city: '',
@@ -148,6 +155,13 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
       // Update form values based on selected template
       form.setValue('companyId', selectedTemplate.id);
       
+      // Update client information
+      form.setValue('client.name', selectedTemplate.name);
+      form.setValue('client.address', selectedTemplate.address);
+      form.setValue('client.city', selectedTemplate.city);
+      form.setValue('client.postalCode', selectedTemplate.postalCode);
+      form.setValue('client.country', selectedTemplate.country);
+      
       // Set default description to first item if available
       if (form.getValues('items').length > 0 && selectedTemplate.description) {
         form.setValue('items.0.description', selectedTemplate.description);
@@ -161,6 +175,8 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
       // Set tax rate if EU
       if (selectedTemplate.isEU) {
         form.setValue('taxRate', 20); // Default EU VAT rate
+      } else {
+        form.setValue('taxRate', 0);
       }
     }
   }, [selectedTemplate, form, initialData]);

@@ -36,8 +36,15 @@ const ClientInfoForm: React.FC<ClientInfoFormProps> = ({ form }) => {
         form.setValue('items.0.description', selectedTemplate.description);
       }
       
-      // If company is not in EU, set tax rate to 0
-      if (!selectedTemplate.isEU) {
+      // Set notes if available
+      if (selectedTemplate.notes) {
+        form.setValue('notes', selectedTemplate.notes);
+      }
+      
+      // Set tax rate based on EU status
+      if (selectedTemplate.isEU) {
+        form.setValue('taxRate', 20); // Default EU VAT rate
+      } else {
         form.setValue('taxRate', 0);
       }
     }

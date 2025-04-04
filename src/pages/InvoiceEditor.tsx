@@ -21,8 +21,11 @@ const InvoiceEditor: React.FC = () => {
   
   // Validate the template ID exists
   useEffect(() => {
-    if (templateId && !getTemplateById(templateId)) {
-      toast.error('Selected template not found');
+    if (templateId) {
+      const template = getTemplateById(templateId);
+      if (!template) {
+        toast.error('Selected template not found');
+      }
     }
   }, [templateId, getTemplateById]);
   
