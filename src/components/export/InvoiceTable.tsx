@@ -36,6 +36,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   handleDelete,
 }) => {
   const navigate = useNavigate();
+  const selectedCount = selectedInvoices.length;
+  const totalCount = filteredInvoices.length;
 
   return (
     <div className="border rounded-lg overflow-hidden shadow-sm">
@@ -45,11 +47,18 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
-                  checked={filteredInvoices.length > 0 && selectedInvoices.length === filteredInvoices.length}
+                  checked={totalCount > 0 && selectedCount === totalCount}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
-              <TableHead>Invoice Number</TableHead>
+              <TableHead>
+                Invoice Number
+                {selectedCount > 0 && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    ({selectedCount} selected)
+                  </span>
+                )}
+              </TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Due Date</TableHead>

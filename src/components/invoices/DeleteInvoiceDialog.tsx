@@ -15,12 +15,16 @@ interface DeleteInvoiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirmDelete: () => void;
+  isBulkDelete?: boolean;
+  count?: number;
 }
 
 const DeleteInvoiceDialog: React.FC<DeleteInvoiceDialogProps> = ({
   open,
   onOpenChange,
   onConfirmDelete,
+  isBulkDelete = false,
+  count = 1,
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -28,7 +32,9 @@ const DeleteInvoiceDialog: React.FC<DeleteInvoiceDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete this invoice. This action cannot be undone.
+            {isBulkDelete 
+              ? `This will permanently delete ${count} selected invoice${count !== 1 ? 's' : ''}. This action cannot be undone.`
+              : 'This will permanently delete this invoice. This action cannot be undone.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
