@@ -17,7 +17,6 @@ const clientSchema = z.object({
   city: z.string().min(1, "City is required"),
   postalCode: z.string().min(1, "Postal code is required"),
   country: z.string().min(1, "Country is required"),
-  email: z.string().email("Invalid email address"),
 });
 
 const invoiceItemSchema = z.object({
@@ -80,7 +79,6 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
       city: '',
       postalCode: '',
       country: '',
-      email: '',
     } as ClientInfo,
     items: [createEmptyItem()],
     notes: '',

@@ -18,6 +18,8 @@ export interface CompanyTemplate {
   email: string;
   logo?: string;
   taxId?: string;
+  description?: string;
+  isEU?: boolean;
 }
 
 export interface ClientInfo {
@@ -26,7 +28,6 @@ export interface ClientInfo {
   city: string;
   postalCode: string;
   country: string;
-  email: string;
 }
 
 export interface Invoice {

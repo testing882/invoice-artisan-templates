@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CompanyTemplate } from '@/types/invoice';
 
 const templateSchema = z.object({
@@ -20,7 +22,9 @@ const templateSchema = z.object({
   city: z.string().min(1, "City is required"),
   postalCode: z.string().min(1, "Postal code is required"),
   country: z.string().min(1, "Country is required"),
+  description: z.string().optional(),
   logo: z.string().optional(),
+  isEU: z.boolean().default(false),
 });
 
 type TemplateFormValues = z.infer<typeof templateSchema>;
@@ -39,14 +43,18 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       city: initialData.city,
       postalCode: initialData.postalCode,
       country: initialData.country,
+      description: initialData.description || '',
       logo: initialData.logo || '',
+      isEU: initialData.isEU || false,
     } : {
       name: '',
       address: '',
       city: '',
       postalCode: '',
       country: '',
+      description: '',
       logo: '',
+      isEU: false,
     },
   });
 
@@ -62,6 +70,8 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       phone: initialData?.phone || '',
       taxId: initialData?.taxId || '',
       logo: values.logo,
+      description: values.description,
+      isEU: values.isEU,
     };
     onSubmit(template);
   };
@@ -139,7 +149,39 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
               </FormItem>
             )}
           />
+          
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Default Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Service description" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
+        
+        <FormField
+          control={form.control}
+          name="isEU"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Company is in EU region (applies tax)</FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
         
         <div className="flex justify-end gap-4">
           <Button type="submit" className="bg-invoice-blue hover:bg-invoice-darkBlue">

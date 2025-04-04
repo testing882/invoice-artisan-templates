@@ -32,7 +32,16 @@ const ClientInfoForm: React.FC<ClientInfoFormProps> = ({ form }) => {
       form.setValue('client.city', selectedTemplate.city);
       form.setValue('client.postalCode', selectedTemplate.postalCode);
       form.setValue('client.country', selectedTemplate.country);
-      form.setValue('client.email', selectedTemplate.email || '');
+      
+      // If template has a description, set it for the first item
+      if (selectedTemplate.description && form.getValues('items')[0]) {
+        form.setValue('items.0.description', selectedTemplate.description);
+      }
+      
+      // If company is not in EU, set tax rate to 0
+      if (!selectedTemplate.isEU) {
+        form.setValue('taxRate', 0);
+      }
     }
   };
 
@@ -69,20 +78,6 @@ const ClientInfoForm: React.FC<ClientInfoFormProps> = ({ form }) => {
               <FormLabel>Client Name</FormLabel>
               <FormControl>
                 <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="client.email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
