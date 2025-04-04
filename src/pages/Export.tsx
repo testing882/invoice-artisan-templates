@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { isWithinInterval } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -5,16 +6,21 @@ import { Download } from 'lucide-react';
 import { useInvoices } from '@/context/InvoicesContext';
 import { exportToPdf } from '@/lib/invoice-utils';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import FilterSection from '@/components/export/FilterSection';
 import InvoiceTable from '@/components/export/InvoiceTable';
+import DeleteInvoiceDialog from '@/components/invoices/DeleteInvoiceDialog';
 
 const Export: React.FC = () => {
-  const { invoices } = useInvoices();
+  const navigate = useNavigate();
+  const { invoices, deleteInvoice } = useInvoices();
   
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [selectedCompany, setSelectedCompany] = useState<string>("all");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [invoiceToDelete, setInvoiceToDelete] = useState<string | null>(null);
   
   // Get unique client company names for the filter
   const uniqueCompanies = React.useMemo(() => {
@@ -64,7 +70,7 @@ const Export: React.FC = () => {
         toast.success(`Exported ${invoice.invoiceNumber} to PDF`);
       } catch (error) {
         console.error('Error exporting to PDF:', error);
-        toast.error(`Failed to export ${invoice.invoiceNumber}`);
+        toast.error(`Failed to export ${invoice.invoiceNumber}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
   };
@@ -97,6 +103,24 @@ const Export: React.FC = () => {
     
     if (errorCount > 0) {
       toast.error(`Failed to export ${errorCount} invoice(s)`);
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    navigate(`/create-invoice/${id}`);
+  };
+
+  const handleDelete = (id: string) => {
+    setInvoiceToDelete(id);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (invoiceToDelete) {
+      deleteInvoice(invoiceToDelete);
+      setInvoiceToDelete(null);
+      setShowDeleteDialog(false);
+      toast.success('Invoice deleted successfully');
     }
   };
 
@@ -137,6 +161,14 @@ const Export: React.FC = () => {
         handleSelect={handleSelect}
         handleSelectAll={handleSelectAll}
         handleExport={handleExport}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+      />
+
+      <DeleteInvoiceDialog 
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirmDelete={confirmDelete}
       />
     </div>
   );

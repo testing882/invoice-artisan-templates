@@ -42,7 +42,7 @@ const InvoiceView: React.FC = () => {
       toast.success('Invoice exported to PDF');
     } catch (error) {
       console.error('Error exporting to PDF:', error);
-      toast.error('Failed to export invoice to PDF');
+      toast.error(`Failed to export invoice to PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
   

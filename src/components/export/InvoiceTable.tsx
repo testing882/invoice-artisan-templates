@@ -12,7 +12,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Download, Eye } from 'lucide-react';
+import { Download, Edit, Eye, Trash } from 'lucide-react';
 import { formatCurrency } from '@/lib/invoice-utils';
 import { Invoice } from '@/types/invoice';
 
@@ -22,6 +22,8 @@ interface InvoiceTableProps {
   handleSelect: (id: string) => void;
   handleSelectAll: () => void;
   handleExport: (id: string) => void;
+  handleEdit?: (id: string) => void;
+  handleDelete?: (id: string) => void;
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
@@ -30,6 +32,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   handleSelect,
   handleSelectAll,
   handleExport,
+  handleEdit,
+  handleDelete,
 }) => {
   const navigate = useNavigate();
 
@@ -98,6 +102,25 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                       >
                         <Download className="w-4 h-4" />
                       </Button>
+                      {handleEdit && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(invoice.id)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {handleDelete && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleDelete(invoice.id)}
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

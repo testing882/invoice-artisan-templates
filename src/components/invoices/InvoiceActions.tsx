@@ -1,23 +1,56 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, Edit, Trash } from 'lucide-react';
 
 interface InvoiceActionsProps {
   onExportPdf: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  showEditDelete?: boolean;
 }
 
 const InvoiceActions: React.FC<InvoiceActionsProps> = ({
   onExportPdf,
+  onEdit,
+  onDelete,
+  showEditDelete = false,
 }) => {
   return (
-    <Button 
-      className="bg-invoice-blue hover:bg-invoice-darkBlue"
-      onClick={onExportPdf}
-    >
-      <Download className="w-4 h-4 mr-2" />
-      Export PDF
-    </Button>
+    <div className="flex gap-2">
+      <Button 
+        className="bg-invoice-blue hover:bg-invoice-darkBlue"
+        onClick={onExportPdf}
+      >
+        <Download className="w-4 h-4 mr-2" />
+        Export PDF
+      </Button>
+      
+      {showEditDelete && (
+        <>
+          {onEdit && (
+            <Button 
+              variant="outline"
+              onClick={onEdit}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit
+            </Button>
+          )}
+          
+          {onDelete && (
+            <Button 
+              variant="outline"
+              className="text-destructive hover:text-destructive"
+              onClick={onDelete}
+            >
+              <Trash className="w-4 h-4 mr-2" />
+              Delete
+            </Button>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 
