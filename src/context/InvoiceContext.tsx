@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Invoice, CompanyTemplate, ClientInfo, InvoiceItem } from '@/types/invoice';
 import { toast } from 'sonner';
@@ -32,7 +33,32 @@ const sampleTemplates: CompanyTemplate[] = [
     phone: '(555) 123-4567',
     email: 'billing@acmeinc.com',
     taxId: 'US12345678',
+    isEU: false,
   },
+  {
+    id: '2',
+    name: 'TechCorp',
+    address: '456 Innovation Ave',
+    city: 'Silicon Valley',
+    postalCode: '94043',
+    country: 'USA',
+    phone: '(555) 987-6543',
+    email: 'accounts@techcorp.com',
+    taxId: 'US98765432',
+    isEU: false,
+  },
+  {
+    id: '3',
+    name: 'EuroSoft GmbH',
+    address: '789 Hauptstrasse',
+    city: 'Berlin',
+    postalCode: '10115',
+    country: 'Germany',
+    phone: '+49 30 12345678',
+    email: 'billing@eurosoft.de',
+    taxId: 'DE123456789',
+    isEU: true,
+  }
 ];
 
 const sampleInvoice: Invoice = {
@@ -104,6 +130,10 @@ export const InvoiceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (error) {
       console.error('Error loading saved data:', error);
       toast.error('Failed to load saved data');
+      
+      // Fallback to sample data if there's an error
+      setInvoices([sampleInvoice]);
+      setTemplates(sampleTemplates);
     }
   }, []);
 
