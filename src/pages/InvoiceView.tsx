@@ -6,10 +6,6 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useInvoices } from '@/context/InvoicesContext';
-import { exportToPdf } from '@/lib/invoice-utils';
-import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Import the smaller components
@@ -21,6 +17,11 @@ import InvoiceItemsTable from '@/components/invoices/InvoiceItemsTable';
 import InvoiceTotals from '@/components/invoices/InvoiceTotals';
 import InvoiceNotes from '@/components/invoices/InvoiceNotes';
 import DeleteInvoiceDialog from '@/components/invoices/DeleteInvoiceDialog';
+import InvoiceActions from '@/components/invoices/InvoiceActions';
+
+// Import hooks and utilities
+import { useInvoices } from '@/context/InvoicesContext';
+import { exportToPdf } from '@/lib/invoice-utils';
 
 const InvoiceView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -90,13 +91,7 @@ const InvoiceView: React.FC = () => {
         </CardContent>
         
         <CardFooter className="bg-invoice-lightGray p-8 flex justify-end">
-          <Button 
-            className="bg-invoice-blue hover:bg-invoice-darkBlue"
-            onClick={handleExportPdf}
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export PDF
-          </Button>
+          <InvoiceActions onExportPdf={handleExportPdf} />
         </CardFooter>
       </Card>
       

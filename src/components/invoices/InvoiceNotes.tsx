@@ -8,10 +8,17 @@ interface InvoiceNotesProps {
 const InvoiceNotes: React.FC<InvoiceNotesProps> = ({ notes }) => {
   if (!notes) return null;
   
+  // Split notes by line breaks to create paragraphs
+  const noteLines = notes.split('\n');
+  
   return (
-    <div className="mt-8">
+    <div className="mt-8 bg-invoice-lightGray/30 rounded-md p-4">
       <h3 className="font-medium text-invoice-gray mb-2">Notes</h3>
-      <p className="text-invoice-darkGray">{notes}</p>
+      <div className="text-invoice-darkGray space-y-2">
+        {noteLines.map((line, index) => (
+          <p key={index}>{line}</p>
+        ))}
+      </div>
     </div>
   );
 };
