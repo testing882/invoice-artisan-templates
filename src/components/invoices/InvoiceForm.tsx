@@ -141,7 +141,13 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
   useEffect(() => {
     const calculatedItems = watchedItems.map(item => ({
       ...item,
-      amount: calculateItemAmount(item),
+      amount: calculateItemAmount({
+        id: item.id,
+        description: item.description,
+        quantity: item.quantity,
+        rate: item.rate,
+        amount: item.amount
+      }),
     }));
     
     // Update form with recalculated amounts
@@ -181,13 +187,18 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
       company: selectedCompany,
       client: values.client as ClientInfo,
       items: values.items.map(item => ({
-        ...item,
-        amount: calculateItemAmount(item),
-        id: item.id || crypto.randomUUID(),
+        id: item.id,
         description: item.description,
         quantity: item.quantity,
-        rate: item.rate
-      })) as InvoiceItem[],
+        rate: item.rate,
+        amount: calculateItemAmount({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          rate: item.rate,
+          amount: item.amount
+        })
+      })),
       notes: values.notes,
       terms: values.terms,
       totalAmount: subtotal,
