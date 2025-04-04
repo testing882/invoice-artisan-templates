@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { format, startOfMonth, parseISO, isValid, isSameMonth, getYear } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -19,13 +18,10 @@ interface MonthlyData {
 
 export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoices }) => {
   const monthlyData = useMemo(() => {
-    // Get current year
     const currentYear = new Date().getFullYear();
     
-    // Create a map to store monthly totals
     const monthMap = new Map<string, MonthlyData>();
     
-    // Initialize all months for the current year with zero values
     for (let i = 0; i < 12; i++) {
       const date = new Date(currentYear, i, 1);
       const monthStr = format(date, 'MMM');
@@ -38,12 +34,9 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
       });
     }
     
-    // Sum invoice amounts by month
     invoices.forEach(invoice => {
-      // Ensure date is valid
       if (!isValid(invoice.date)) return;
       
-      // Only include invoices from the current year
       if (getYear(invoice.date) !== currentYear) return;
       
       const monthKey = format(invoice.date, 'yyyy-MM');
@@ -54,7 +47,6 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
       }
     });
     
-    // Convert map to array and sort by month
     return Array.from(monthMap.values())
       .sort((a, b) => a.monthKey.localeCompare(b.monthKey));
   }, [invoices]);
@@ -88,12 +80,9 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
         <CardDescription>Total invoice values by month for {new Date().getFullYear()}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
-          <ChartContainer
-            config={chartConfig}
-            className="h-full"
-          >
-            <LineChart data={monthlyData}>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={monthlyData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis 
                 dataKey="month"
@@ -118,7 +107,7 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
                 activeDot={{ r: 6 }}
               />
             </LineChart>
-          </ChartContainer>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>
