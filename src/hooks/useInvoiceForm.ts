@@ -151,7 +151,13 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
       date: values.date,
       dueDate: values.dueDate,
       company: company,
-      client: values.client,
+      client: {
+        name: values.client.name,
+        address: values.client.address,
+        city: values.client.city,
+        postalCode: values.client.postalCode,
+        country: values.client.country,
+      },
       items: values.items.map(item => ({
         id: item.id,
         description: item.description,

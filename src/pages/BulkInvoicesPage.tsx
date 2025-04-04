@@ -120,15 +120,15 @@ const BulkInvoicesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-3xl font-bold text-invoice-darkGray">Bulk Invoice Creation</h1>
       </div>
 
       <div className="grid gap-6">
-        <div className="space-y-4 p-6 bg-white rounded-lg border">
+        <div className="space-y-4 p-6 bg-white rounded-lg border shadow-sm">
           <h2 className="text-xl font-semibold">Invoice Details</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="invoice-date">Invoice Date</Label>
               <Popover>
@@ -170,56 +170,58 @@ const BulkInvoicesPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="space-y-4 p-6 bg-white rounded-lg border">
+        <div className="space-y-4 p-6 bg-white rounded-lg border shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Company Amounts</h2>
           </div>
 
-          <div className="border rounded-md overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {companies.length > 0 ? (
-                  companies.map((company, index) => (
-                    <TableRow key={company.template.id}>
-                      <TableCell className="font-medium">
-                        {company.template.name}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <Input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={company.amount}
-                            onChange={(e) => handleAmountChange(index, e.target.value)}
-                            placeholder="0.00"
-                            className="w-32"
-                          />
-                        </div>
+          <div className="border rounded-md overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-1/2">Company</TableHead>
+                    <TableHead className="w-1/2">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {companies.length > 0 ? (
+                    companies.map((company, index) => (
+                      <TableRow key={company.template.id}>
+                        <TableCell className="font-medium">
+                          {company.template.name}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center">
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={company.amount}
+                              onChange={(e) => handleAmountChange(index, e.target.value)}
+                              placeholder="0.00"
+                              className="w-full md:w-32"
+                            />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={2} className="text-center py-10">
+                        No company templates available. Create templates first.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={2} className="text-center py-4">
-                      No company templates available. Create templates first.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-4">
             <Button
               onClick={handleGenerateInvoices}
-              className="bg-invoice-blue hover:bg-invoice-darkBlue"
+              className="bg-invoice-blue hover:bg-invoice-darkBlue w-full md:w-auto"
               disabled={companies.length === 0}
             >
               Bulk Generate Invoices
