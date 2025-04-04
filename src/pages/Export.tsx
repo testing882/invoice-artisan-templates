@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, isWithinInterval } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { 
   Table, 
@@ -14,13 +14,34 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useInvoice } from '@/context/InvoiceContext';
 import { formatCurrency, exportToPdf } from '@/lib/invoice-utils';
-import { Download, Eye } from 'lucide-react';
+import { Download, Eye, CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 const Export: React.FC = () => {
   const { invoices } = useInvoice();
   const navigate = useNavigate();
   const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  
+  const filteredInvoices = invoices.filter(invoice => {
+    if (startDate && endDate) {
+      return isWithinInterval(invoice.date, { start: startDate, end: endDate });
+    } else if (startDate) {
+      return invoice.date >= startDate;
+    } else if (endDate) {
+      return invoice.date <= endDate;
+    }
+    return true;
+  });
   
   const handleSelect = (id: string) => {
     setSelectedInvoices(prev => 
@@ -31,10 +52,10 @@ const Export: React.FC = () => {
   };
   
   const handleSelectAll = () => {
-    if (selectedInvoices.length === invoices.length) {
+    if (selectedInvoices.length === filteredInvoices.length) {
       setSelectedInvoices([]);
     } else {
-      setSelectedInvoices(invoices.map(invoice => invoice.id));
+      setSelectedInvoices(filteredInvoices.map(invoice => invoice.id));
     }
   };
   
@@ -81,6 +102,11 @@ const Export: React.FC = () => {
       toast.error(`Failed to export ${errorCount} invoice(s)`);
     }
   };
+
+  const clearFilters = () => {
+    setStartDate(undefined);
+    setEndDate(undefined);
+  };
   
   return (
     <div className="space-y-6">
@@ -96,13 +122,79 @@ const Export: React.FC = () => {
         </Button>
       </div>
       
+      <div className="flex flex-wrap items-end gap-4 mb-4 p-4 bg-gray-50 rounded-md">
+        <div className="space-y-2">
+          <Label htmlFor="start-date">Start Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="start-date"
+                variant={"outline"}
+                className={cn(
+                  "w-[200px] justify-start text-left font-normal",
+                  !startDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {startDate ? format(startDate, "PPP") : <span>Pick a start date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={setStartDate}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="end-date">End Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="end-date"
+                variant={"outline"}
+                className={cn(
+                  "w-[200px] justify-start text-left font-normal",
+                  !endDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {endDate ? format(endDate, "PPP") : <span>Pick an end date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={setEndDate}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          onClick={clearFilters}
+          className="ml-auto"
+        >
+          Clear Filters
+        </Button>
+      </div>
+      
       <div className="border rounded-md">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
-                  checked={invoices.length > 0 && selectedInvoices.length === invoices.length}
+                  checked={filteredInvoices.length > 0 && selectedInvoices.length === filteredInvoices.length}
                   onCheckedChange={handleSelectAll}
                 />
               </TableHead>
@@ -116,8 +208,8 @@ const Export: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.length > 0 ? (
-              invoices.map((invoice) => (
+            {filteredInvoices.length > 0 ? (
+              filteredInvoices.map((invoice) => (
                 <TableRow key={invoice.id}>
                   <TableCell>
                     <Checkbox
@@ -166,7 +258,9 @@ const Export: React.FC = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-6">
-                  No invoices created yet
+                  {startDate || endDate 
+                    ? "No invoices found for the selected date range" 
+                    : "No invoices created yet"}
                 </TableCell>
               </TableRow>
             )}
