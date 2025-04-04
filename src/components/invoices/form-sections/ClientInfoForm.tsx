@@ -19,6 +19,7 @@ interface ClientInfoFormProps {
 
 const ClientInfoForm: React.FC<ClientInfoFormProps> = ({ form }) => {
   const { templates } = useInvoice();
+  const [selectedVatNumber, setSelectedVatNumber] = React.useState<string>('');
 
   const handleTemplateSelect = (templateId: string) => {
     const selectedTemplate = templates.find(t => t.id === templateId);
@@ -47,6 +48,9 @@ const ClientInfoForm: React.FC<ClientInfoFormProps> = ({ form }) => {
       } else {
         form.setValue('taxRate', 0);
       }
+      
+      // Store VAT number for display
+      setSelectedVatNumber(selectedTemplate.vatNumber || '');
     }
   };
 
@@ -72,6 +76,13 @@ const ClientInfoForm: React.FC<ClientInfoFormProps> = ({ form }) => {
                 ))}
               </SelectContent>
             </Select>
+            
+            {/* Display VAT Number when a template with VAT is selected */}
+            {selectedVatNumber && (
+              <div className="mt-2 text-sm text-invoice-gray">
+                <span className="font-medium">VAT Number:</span> {selectedVatNumber}
+              </div>
+            )}
           </div>
         )}
         
