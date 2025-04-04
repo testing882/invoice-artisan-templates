@@ -1,146 +1,150 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CompanyTemplate } from '@/types/invoice';
 import { UseFormReturn } from 'react-hook-form';
 import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface InvoiceDetailsProps {
   form: UseFormReturn<InvoiceFormValues>;
   templates: CompanyTemplate[];
 }
 
-const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form, templates }) => {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <FormField
-        control={form.control}
-        name="invoiceNumber"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Invoice Number</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="date"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Date</FormLabel>
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "MMM dd, yyyy")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={form.control}
-        name="dueDate"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Due Date</FormLabel>
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "MMM dd, yyyy")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={field.value}
-                  onSelect={field.onChange}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
+  useEffect(() => {
+    // Create a company object from localStorage data
+    const companyId = "your-company";
+    const companyName = localStorage.getItem('company_name') || 'Your Company';
+    const companyStreet = localStorage.getItem('company_street') || '';
+    const companyCity = localStorage.getItem('company_city') || '';
+    const companyZipCode = localStorage.getItem('company_zipCode') || '';
+    const companyCountry = localStorage.getItem('company_country') || '';
+    const companyEmail = localStorage.getItem('company_email') || '';
+    
+    // Set the company ID in the form
+    form.setValue('companyId', companyId);
+  }, [form]);
 
-      <div className="md:col-span-3">
+  return (
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <FormField
           control={form.control}
-          name="companyId"
+          name="invoiceNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Your Company</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a company template" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {templates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
-                      {template.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>Invoice Number</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Date</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "MMM dd, yyyy")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="dueDate"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel>Due Date</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value ? (
+                        format(field.value, "MMM dd, yyyy")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
+      
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Building2 className="h-5 w-5 text-invoice-blue" />
+            <h3 className="text-sm font-semibold">Your Company</h3>
+          </div>
+          <div className="text-sm text-gray-500">
+            <p>{localStorage.getItem('company_name') || 'Company name not set'}</p>
+            <p>{localStorage.getItem('company_street') || ''}{localStorage.getItem('company_street') ? ', ' : ''}{localStorage.getItem('company_city') || ''}</p>
+            <p>{localStorage.getItem('company_zipCode') || ''}{localStorage.getItem('company_zipCode') ? ', ' : ''}{localStorage.getItem('company_country') || ''}</p>
+            <p>{localStorage.getItem('company_email') || ''}</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

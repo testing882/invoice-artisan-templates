@@ -39,7 +39,6 @@ export interface Invoice {
   client: ClientInfo;
   items: InvoiceItem[];
   notes?: string;
-  terms?: string;
   totalAmount: number;
   taxRate?: number;
   taxAmount?: number;

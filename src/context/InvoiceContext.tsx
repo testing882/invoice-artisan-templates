@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Invoice, CompanyTemplate, ClientInfo, InvoiceItem } from '@/types/invoice';
 import { toast } from 'sonner';
@@ -48,7 +47,6 @@ const sampleInvoice: Invoice = {
     city: 'Clientville',
     postalCode: '54321',
     country: 'USA',
-    email: 'accounts@clientcompany.com',
   },
   items: [
     {
@@ -67,7 +65,6 @@ const sampleInvoice: Invoice = {
     },
   ],
   notes: 'Thank you for your business!',
-  terms: 'Payment due within 30 days.',
   totalAmount: 4700,
   taxRate: 8.5,
   taxAmount: 399.5,

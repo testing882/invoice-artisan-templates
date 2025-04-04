@@ -32,7 +32,7 @@ const invoiceSchema = z.object({
   invoiceNumber: z.string().min(1, "Invoice number is required"),
   date: z.date(),
   dueDate: z.date(),
-  companyId: z.string().min(1, "Please select a company template"),
+  companyId: z.string().min(1, "Company is required"),
   client: clientSchema,
   items: z.array(invoiceItemSchema).nonempty("At least one item is required"),
   notes: z.string().optional(),
@@ -49,6 +49,20 @@ const createEmptyItem = (): InvoiceItem => ({
   rate: 0,
   amount: 0,
 });
+
+// Create a company template from localStorage data
+const createCompanyFromLocalStorage = (): CompanyTemplate => {
+  return {
+    id: "your-company",
+    name: localStorage.getItem('company_name') || 'Your Company',
+    address: localStorage.getItem('company_street') || '',
+    city: localStorage.getItem('company_city') || '',
+    postalCode: localStorage.getItem('company_zipCode') || '',
+    country: localStorage.getItem('company_country') || '',
+    phone: '',
+    email: localStorage.getItem('company_email') || '',
+  };
+};
 
 interface UseInvoiceFormProps {
   initialData?: Invoice;
@@ -71,7 +85,7 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     invoiceNumber: generateInvoiceNumber(),
     date: new Date(),
     dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-    companyId: templateId || (templates.length > 0 ? templates[0].id : ''),
+    companyId: "your-company",
     client: {
       name: '',
       address: '',
@@ -126,14 +140,17 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
   }, [watchedItems, watchedTaxRate, form]);
 
   const createInvoiceFromFormData = (values: InvoiceFormValues): Invoice => {
-    const selectedCompany = templates.find(t => t.id === values.companyId)!;
+    // If it's the user's company from localStorage, create it from localStorage data
+    const company = values.companyId === "your-company" 
+      ? createCompanyFromLocalStorage() 
+      : templates.find(t => t.id === values.companyId) || createCompanyFromLocalStorage();
     
     return {
       id: initialData?.id || crypto.randomUUID(),
       invoiceNumber: values.invoiceNumber,
       date: values.date,
       dueDate: values.dueDate,
-      company: selectedCompany,
+      company: company,
       client: values.client,
       items: values.items.map(item => ({
         id: item.id,
