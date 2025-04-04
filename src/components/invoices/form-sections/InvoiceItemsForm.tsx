@@ -51,7 +51,9 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
           const newAmount = quantity * rate;
           
           // Update the amount field
-          form.setValue(`items.${fieldIndex}.amount`, newAmount);
+          form.setValue(`items.${fieldIndex}.amount`, newAmount, { 
+            shouldValidate: false 
+          });
         }
       }
     });
@@ -119,8 +121,9 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               // Manually calculate and update amount when quantity changes
                               const quantity = parseFloat(e.target.value) || 0;
                               const rate = parseFloat(form.getValues(`items.${index}.rate`)) || 0;
-                              // Convert number to the correct type for the setValue function
-                              form.setValue(`items.${index}.amount`, quantity * rate as any);
+                              const amount = quantity * rate;
+                              // Use amount directly without type assertion
+                              form.setValue(`items.${index}.amount`, amount);
                             }}
                           />
                         </FormControl>
@@ -146,8 +149,9 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               // Manually calculate and update amount when rate changes
                               const rate = parseFloat(e.target.value) || 0;
                               const quantity = parseFloat(form.getValues(`items.${index}.quantity`)) || 0;
-                              // Convert number to the correct type for the setValue function
-                              form.setValue(`items.${index}.amount`, quantity * rate as any);
+                              const amount = quantity * rate;
+                              // Use amount directly without type assertion
+                              form.setValue(`items.${index}.amount`, amount);
                             }}
                           />
                         </FormControl>
