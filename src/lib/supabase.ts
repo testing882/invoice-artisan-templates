@@ -20,16 +20,11 @@ export type SupabaseTemplate = {
   created_at: string;
 };
 
-// Get environment variables
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Use the client that's already properly set up in the integrations directory
+import { supabase } from '@/integrations/supabase/client';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables');
-}
-
-// Create Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Export supabase client from the integrations directory
+export { supabase };
 
 // Convert snake_case from DB to camelCase for frontend
 export const mapTemplateFromSupabase = (template: SupabaseTemplate): CompanyTemplate => ({
