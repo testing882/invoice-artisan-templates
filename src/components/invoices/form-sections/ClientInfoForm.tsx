@@ -6,6 +6,13 @@ import { UseFormReturn } from 'react-hook-form';
 import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
 import { useInvoice } from '@/context/InvoiceContext';
 import { Users } from 'lucide-react';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 interface ClientInfoFormProps {
   form: UseFormReturn<InvoiceFormValues>;
@@ -44,6 +51,22 @@ const ClientInfoForm: React.FC<ClientInfoFormProps> = ({ form }) => {
       </div>
 
       <div className="space-y-6">
+        <div className="mb-6">
+          <FormLabel>Client Template</FormLabel>
+          <Select onValueChange={handleTemplateSelect}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a client template" />
+            </SelectTrigger>
+            <SelectContent>
+              {templates.map((template) => (
+                <SelectItem key={template.id} value={template.id}>
+                  {template.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
         <FormField
           control={form.control}
           name="client.name"
