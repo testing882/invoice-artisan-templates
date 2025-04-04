@@ -3,31 +3,7 @@ import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from 'react-hook-form';
-
-interface InvoiceFormValues {
-  invoiceNumber: string;
-  date: Date;
-  dueDate: Date;
-  companyId: string;
-  client: {
-    name: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    email: string;
-  };
-  items: {
-    id: string;
-    description: string;
-    quantity: number;
-    rate: number;
-    amount: number;
-  }[];
-  notes?: string;
-  terms?: string;
-  taxRate?: number;
-}
+import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
 
 interface ClientInfoFormProps {
   form: UseFormReturn<InvoiceFormValues>;

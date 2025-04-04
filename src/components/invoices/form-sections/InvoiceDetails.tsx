@@ -11,31 +11,7 @@ import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CompanyTemplate } from '@/types/invoice';
 import { UseFormReturn } from 'react-hook-form';
-
-interface InvoiceFormValues {
-  invoiceNumber: string;
-  date: Date;
-  dueDate: Date;
-  companyId: string;
-  client: {
-    name: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    email: string;
-  };
-  items: {
-    id: string;
-    description: string;
-    quantity: number;
-    rate: number;
-    amount: number;
-  }[];
-  notes?: string;
-  terms?: string;
-  taxRate?: number;
-}
+import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
 
 interface InvoiceDetailsProps {
   form: UseFormReturn<InvoiceFormValues>;

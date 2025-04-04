@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
@@ -7,31 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash } from 'lucide-react';
 import { InvoiceItem } from '@/types/invoice';
 import { formatCurrency, calculateItemAmount } from '@/lib/invoice-utils';
-
-interface InvoiceFormValues {
-  invoiceNumber: string;
-  date: Date;
-  dueDate: Date;
-  companyId: string;
-  client: {
-    name: string;
-    address: string;
-    city: string;
-    postalCode: string;
-    country: string;
-    email: string;
-  };
-  items: {
-    id: string;
-    description: string;
-    quantity: number;
-    rate: number;
-    amount: number;
-  }[];
-  notes?: string;
-  terms?: string;
-  taxRate?: number;
-}
+import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
 
 interface InvoiceItemsFormProps {
   form: UseFormReturn<InvoiceFormValues>;
