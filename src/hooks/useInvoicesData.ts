@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Invoice } from '@/types/invoice';
 import { 
@@ -7,15 +6,22 @@ import {
   updateInvoiceInDatabase, 
   deleteInvoiceFromDatabase 
 } from '@/api/invoiceApi';
+import { useAuth } from '@/context/AuthContext';
 
 export const useInvoicesData = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
-  // Load invoices on initial render
+  // Load invoices when authentication state changes
   useEffect(() => {
     const loadInvoices = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         const data = await fetchInvoices();
@@ -30,7 +36,7 @@ export const useInvoicesData = () => {
     };
 
     loadInvoices();
-  }, []);
+  }, [user]); // Depend on auth user state
 
   const addInvoice = async (invoice: Invoice) => {
     try {

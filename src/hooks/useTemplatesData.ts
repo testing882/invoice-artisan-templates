@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { CompanyTemplate } from '@/types/invoice';
 import { 
@@ -7,15 +6,22 @@ import {
   updateTemplateInDatabase, 
   deleteTemplateFromDatabase 
 } from '@/api/templateApi';
+import { useAuth } from '@/context/AuthContext';
 
 export const useTemplatesData = () => {
   const [templates, setTemplates] = useState<CompanyTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
-  // Load templates on initial render
+  // Load templates when authentication state changes
   useEffect(() => {
     const loadTemplates = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
         console.log('Loading templates in useTemplatesData...');
         setLoading(true);
@@ -32,7 +38,7 @@ export const useTemplatesData = () => {
     };
 
     loadTemplates();
-  }, []);
+  }, [user]); // Depend on auth user state
 
   const addTemplate = async (template: CompanyTemplate) => {
     try {
