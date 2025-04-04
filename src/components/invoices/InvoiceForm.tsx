@@ -11,6 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  useFieldArray,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -124,7 +125,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
     defaultValues,
   });
   
-  const { fields, append, remove } = form.useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     name: "items",
     control: form.control,
   });
@@ -160,7 +161,13 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
   }, [watchedItems, watchedTaxRate, form]);
   
   const handleAddItem = () => {
-    append(emptyItem);
+    append({
+      id: crypto.randomUUID(),
+      description: '',
+      quantity: 1,
+      rate: 0,
+      amount: 0,
+    });
   };
   
   const handleSubmit = (values: InvoiceFormValues) => {
