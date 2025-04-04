@@ -1,6 +1,7 @@
+
 import React, { useMemo } from 'react';
 import { format, startOfMonth, parseISO, isValid, isSameMonth, getYear } from 'date-fns';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Invoice } from '@/types/invoice';
 import { formatCurrency } from '@/lib/invoice-utils';
@@ -82,7 +83,7 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
       <CardContent>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={monthlyData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={monthlyData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis 
                 dataKey="month"
@@ -97,16 +98,13 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
                 tick={{ fill: '#888888' }}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Line 
-                type="monotone"
+              <Bar 
                 dataKey="value" 
                 name="invoices"
-                stroke="var(--color-invoices)"
-                strokeWidth={2}
-                dot={{ r: 4, fill: "var(--color-invoices)" }}
-                activeDot={{ r: 6 }}
+                fill="var(--color-invoices)" 
+                radius={[4, 4, 0, 0]}
               />
-            </LineChart>
+            </BarChart>
           </ResponsiveContainer>
         </div>
       </CardContent>
