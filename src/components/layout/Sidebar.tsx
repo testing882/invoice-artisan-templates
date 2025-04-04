@@ -1,10 +1,14 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FileText, Download, CalendarPlus, Building, Building2, Files } from 'lucide-react';
+import { FileText, Download, CalendarPlus, Building, Building2, Files, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
 
 export const Sidebar: React.FC = () => {
+  const { user, signOut } = useAuth();
+  
   const navItems = [
     { name: 'Dashboard', path: '/', icon: <FileText className="w-5 h-5" /> },
     { name: 'Your Company', path: '/company', icon: <Building2 className="w-5 h-5" /> },
@@ -15,11 +19,12 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <div className="w-64 bg-sidebar border-r border-border">
+    <div className="w-64 bg-sidebar border-r border-border h-screen flex flex-col">
       <div className="p-6">
         <h1 className="text-2xl font-bold text-invoice-blue">InvoiceArtisan</h1>
       </div>
-      <nav className="px-4 py-6">
+      
+      <nav className="px-4 py-6 flex-1">
         <ul className="space-y-2">
           {navItems.map((item) => (
             <li key={item.name}>
@@ -39,6 +44,22 @@ export const Sidebar: React.FC = () => {
           ))}
         </ul>
       </nav>
+      
+      {user && (
+        <div className="p-4 border-t border-border">
+          <div className="mb-2 px-3 text-sm text-gray-500">
+            Signed in as: <span className="font-medium">{user.email}</span>
+          </div>
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2 text-red-500 hover:text-red-600 hover:bg-red-50"
+            onClick={signOut}
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
