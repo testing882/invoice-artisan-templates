@@ -50,8 +50,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
           const rate = Number(item.rate) || 0;
           const newAmount = quantity * rate;
           
-          // Update the amount field
-          form.setValue(`items.${fieldIndex}.amount`, newAmount, { 
+          // Update the amount field - use type assertion to avoid type conflicts
+          form.setValue(`items.${fieldIndex}.amount`, newAmount as any, { 
             shouldValidate: false 
           });
         }
@@ -122,8 +122,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               const quantity = parseFloat(e.target.value) || 0;
                               const rate = parseFloat(form.getValues(`items.${index}.rate`)) || 0;
                               const amount = quantity * rate;
-                              // Use amount directly without type assertion
-                              form.setValue(`items.${index}.amount`, amount);
+                              // Use type assertion to handle type mismatch
+                              form.setValue(`items.${index}.amount`, amount as any);
                             }}
                           />
                         </FormControl>
@@ -150,8 +150,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               const rate = parseFloat(e.target.value) || 0;
                               const quantity = parseFloat(form.getValues(`items.${index}.quantity`)) || 0;
                               const amount = quantity * rate;
-                              // Use amount directly without type assertion
-                              form.setValue(`items.${index}.amount`, amount);
+                              // Use type assertion to handle type mismatch
+                              form.setValue(`items.${index}.amount`, amount as any);
                             }}
                           />
                         </FormControl>
