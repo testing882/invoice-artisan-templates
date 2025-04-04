@@ -59,7 +59,7 @@ const Templates: React.FC = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>{template.name}</CardTitle>
-                    <CardDescription>{template.email || 'No email provided'}</CardDescription>
+                    <CardDescription>{template.description || 'No description'}</CardDescription>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-invoice-blue flex items-center justify-center text-white font-medium">
                     {template.name.charAt(0)}
@@ -71,8 +71,6 @@ const Templates: React.FC = () => {
                   <p>{template.address}</p>
                   <p>{template.city}, {template.postalCode}</p>
                   <p>{template.country}</p>
-                  <p>{template.phone || 'No phone provided'}</p>
-                  {template.taxId && <p><span className="font-medium">Tax ID:</span> {template.taxId}</p>}
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between">
