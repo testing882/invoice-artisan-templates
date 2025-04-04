@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,29 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
       amount: 0,
     });
   };
+
+  // Add useEffect to update the amount value whenever quantity or rate changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      // Only process changes related to quantity or rate fields
+      if (name && (name.includes('.quantity') || name.includes('.rate'))) {
+        const fieldIndex = parseInt(name.split('.')[1]);
+        
+        if (!isNaN(fieldIndex) && value.items && value.items[fieldIndex]) {
+          const item = value.items[fieldIndex];
+          const quantity = Number(item.quantity) || 0;
+          const rate = Number(item.rate) || 0;
+          const newAmount = quantity * rate;
+          
+          // Update the amount field
+          form.setValue(`items.${fieldIndex}.amount`, newAmount);
+        }
+      }
+    });
+    
+    // Clean up subscription when component unmounts
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <div>
@@ -85,7 +109,19 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input type="number" step="0.01" min="0" {...field} />
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            min="0" 
+                            {...field} 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              // Manually calculate and update amount when quantity changes
+                              const quantity = parseFloat(e.target.value) || 0;
+                              const rate = parseFloat(form.getValues(`items.${index}.rate`)) || 0;
+                              form.setValue(`items.${index}.amount`, quantity * rate);
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -99,7 +135,19 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <Input type="number" step="0.01" min="0" {...field} />
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            min="0" 
+                            {...field} 
+                            onChange={(e) => {
+                              field.onChange(e);
+                              // Manually calculate and update amount when rate changes
+                              const rate = parseFloat(e.target.value) || 0;
+                              const quantity = parseFloat(form.getValues(`items.${index}.quantity`)) || 0;
+                              form.setValue(`items.${index}.amount`, quantity * rate);
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

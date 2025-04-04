@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -190,25 +191,29 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
   const [total, setTotal] = useState(0);
   
   useEffect(() => {
-    const calculatedItems = watchedItems.map(item => ({
-      ...item,
-      amount: calculateItemAmount({
-        id: item.id,
-        description: item.description,
-        quantity: item.quantity,
-        rate: item.rate,
-        amount: item.amount
-      }),
-    }));
+    const calculatedItems = watchedItems.map(item => {
+      // Ensure we're working with numbers even if the form has string values
+      const quantity = Number(item.quantity) || 0;
+      const rate = Number(item.rate) || 0;
+      const calculatedAmount = quantity * rate;
+      
+      return {
+        ...item,
+        quantity,
+        rate,
+        amount: calculatedAmount,
+      };
+    });
     
     // Update form with recalculated amounts
     calculatedItems.forEach((item, index) => {
-      if (item.amount !== watchedItems[index].amount) {
-        form.setValue(`items.${index}.amount`, item.amount);
-      }
+      form.setValue(`items.${index}.amount`, item.amount, { 
+        shouldValidate: false,
+        shouldDirty: true
+      });
     });
     
-    const calculatedSubtotal = calculateInvoiceTotal(calculatedItems as InvoiceItem[]);
+    const calculatedSubtotal = calculatedItems.reduce((sum, item) => sum + item.amount, 0);
     setSubtotal(calculatedSubtotal);
     
     const calculatedTaxAmount = calculateTax(calculatedSubtotal, watchedTaxRate || 0);
@@ -236,19 +241,17 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
         postalCode: values.client.postalCode,
         country: values.client.country,
       },
-      items: values.items.map(item => ({
-        id: item.id,
-        description: item.description,
-        quantity: item.quantity,
-        rate: item.rate,
-        amount: calculateItemAmount({
+      items: values.items.map(item => {
+        const quantity = Number(item.quantity) || 0;
+        const rate = Number(item.rate) || 0;
+        return {
           id: item.id,
           description: item.description,
-          quantity: item.quantity,
-          rate: item.rate,
-          amount: item.amount
-        })
-      })),
+          quantity: quantity,
+          rate: rate,
+          amount: quantity * rate // Calculate amount directly here to ensure consistency
+        };
+      }),
       notes: values.notes,
       totalAmount: subtotal,
       taxRate: values.taxRate,
