@@ -65,14 +65,14 @@ const Dashboard: React.FC = () => {
         </Card>
       </div>
       
-      {/* Monthly Invoice Chart and Top Customers */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <MonthlyInvoiceChart invoices={invoices} />
-        </div>
-        <div className="lg:col-span-1">
-          <TopCustomersChart invoices={invoices} />
-        </div>
+      {/* Monthly Invoice Chart - Full Width */}
+      <div className="grid grid-cols-1 gap-6">
+        <MonthlyInvoiceChart invoices={invoices} />
+      </div>
+      
+      {/* Top Customers Chart */}
+      <div className="grid grid-cols-1 gap-6">
+        <TopCustomersChart invoices={invoices} />
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { format, startOfMonth, parseISO, isValid, isSameMonth, getYear } from 'date-fns';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Invoice } from '@/types/invoice';
 import { formatCurrency } from '@/lib/invoice-utils';
@@ -63,8 +63,8 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
     invoices: {
       label: "Monthly Revenue",
       theme: {
-        light: "#4338ca",
-        dark: "#818cf8",
+        light: "#0EA5E9", // Using invoice-blue from tailwind config
+        dark: "#BAE6FD", // Using invoice-lightBlue from tailwind config
       },
     },
   };
@@ -82,7 +82,7 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
   };
 
   return (
-    <Card className="col-span-1 md:col-span-2">
+    <Card>
       <CardHeader>
         <CardTitle>Monthly Invoice Revenue</CardTitle>
         <CardDescription>Total invoice values by month for {new Date().getFullYear()}</CardDescription>
@@ -93,7 +93,7 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
             config={chartConfig}
             className="h-full"
           >
-            <BarChart data={monthlyData}>
+            <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis 
                 dataKey="month"
@@ -108,13 +108,16 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
                 tick={{ fill: '#888888' }}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Bar 
+              <Line 
+                type="monotone"
                 dataKey="value" 
                 name="invoices"
-                fill="var(--color-invoices)"
-                radius={[4, 4, 0, 0]} 
+                stroke="var(--color-invoices)"
+                strokeWidth={2}
+                dot={{ r: 4, fill: "var(--color-invoices)" }}
+                activeDot={{ r: 6 }}
               />
-            </BarChart>
+            </LineChart>
           </ChartContainer>
         </div>
       </CardContent>
