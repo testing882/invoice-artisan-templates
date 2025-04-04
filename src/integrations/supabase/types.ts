@@ -51,6 +51,8 @@ export type Database = {
           company: Json
           created_at: string
           date: string
+          deleted: boolean | null
+          deleted_at: string | null
           due_date: string
           id: string
           invoice_number: string
@@ -67,6 +69,8 @@ export type Database = {
           company: Json
           created_at?: string
           date: string
+          deleted?: boolean | null
+          deleted_at?: string | null
           due_date: string
           id?: string
           invoice_number: string
@@ -83,6 +87,8 @@ export type Database = {
           company?: Json
           created_at?: string
           date?: string
+          deleted?: boolean | null
+          deleted_at?: string | null
           due_date?: string
           id?: string
           invoice_number?: string
