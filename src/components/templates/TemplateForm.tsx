@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -21,9 +20,6 @@ const templateSchema = z.object({
   city: z.string().min(1, "City is required"),
   postalCode: z.string().min(1, "Postal code is required"),
   country: z.string().min(1, "Country is required"),
-  phone: z.string().min(1, "Phone is required"),
-  email: z.string().email("Invalid email address"),
-  taxId: z.string().optional(),
   logo: z.string().optional(),
 });
 
@@ -37,15 +33,19 @@ interface TemplateFormProps {
 const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) => {
   const form = useForm<TemplateFormValues>({
     resolver: zodResolver(templateSchema),
-    defaultValues: initialData || {
+    defaultValues: initialData ? {
+      name: initialData.name,
+      address: initialData.address,
+      city: initialData.city,
+      postalCode: initialData.postalCode,
+      country: initialData.country,
+      logo: initialData.logo || '',
+    } : {
       name: '',
       address: '',
       city: '',
       postalCode: '',
       country: '',
-      phone: '',
-      email: '',
-      taxId: '',
       logo: '',
     },
   });
@@ -58,9 +58,9 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       city: values.city,
       postalCode: values.postalCode,
       country: values.country,
-      phone: values.phone,
-      email: values.email,
-      taxId: values.taxId,
+      email: initialData?.email || '',
+      phone: initialData?.phone || '',
+      taxId: initialData?.taxId || '',
       logo: values.logo,
     };
     onSubmit(template);
@@ -78,20 +78,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
                 <FormLabel>Company Name</FormLabel>
                 <FormControl>
                   <Input placeholder="Acme Inc" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="billing@acmeinc.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -148,34 +134,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
                 <FormLabel>Country</FormLabel>
                 <FormControl>
                   <Input placeholder="USA" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input placeholder="(555) 123-4567" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="taxId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tax ID (Optional)</FormLabel>
-                <FormControl>
-                  <Input placeholder="AB123456789" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

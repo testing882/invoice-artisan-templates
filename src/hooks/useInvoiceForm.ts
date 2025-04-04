@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -82,7 +81,7 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
       postalCode: '',
       country: '',
       email: '',
-    } satisfies ClientInfo,  // Using satisfies to ensure type correctness without casting
+    } as ClientInfo,
     items: [createEmptyItem()],
     notes: '',
     terms: '',
