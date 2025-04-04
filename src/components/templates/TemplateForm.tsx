@@ -30,6 +30,7 @@ const templateSchema = z.object({
   logo: z.string().optional().or(z.literal('')),
   notes: z.string().optional().or(z.literal('')),
   isEU: z.boolean().default(false),
+  vatNumber: z.string().optional().or(z.literal('')),
 });
 
 type TemplateFormValues = z.infer<typeof templateSchema>;
@@ -57,6 +58,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       logo: initialData.logo || '',
       notes: initialData.notes || '',
       isEU: initialData.isEU || false,
+      vatNumber: initialData.vatNumber || '',
     } : {
       name: '',
       address: '',
@@ -70,8 +72,12 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       logo: '',
       notes: '',
       isEU: false,
+      vatNumber: '',
     },
   });
+
+  // Watch the isEU field to conditionally show VAT input
+  const isEU = form.watch('isEU');
 
   const handleSubmit = (values: TemplateFormValues) => {
     console.log('Form values on submit:', values);
@@ -90,6 +96,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       description: values.description || '',
       notes: values.notes || '',
       isEU: values.isEU || false,
+      vatNumber: values.vatNumber || '',
     };
     
     console.log('Generated template:', template);
@@ -221,6 +228,23 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
             </FormItem>
           )}
         />
+        
+        {/* VAT Number field - only shown when isEU is checked */}
+        {isEU && (
+          <FormField
+            control={form.control}
+            name="vatNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>VAT Number</FormLabel>
+                <FormControl>
+                  <Input placeholder="EU VAT Number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         
         <div className="flex justify-end gap-4">
           <Button type="submit" className="bg-invoice-blue hover:bg-invoice-darkBlue">

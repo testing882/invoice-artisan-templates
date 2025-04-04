@@ -20,6 +20,10 @@ const InvoicePartyInfo: React.FC<InvoicePartyInfoProps> = ({
           <p>{company.address}</p>
           <p>{company.city}, {company.postalCode}</p>
           <p>{company.country}</p>
+          {company.email && <p className="mt-2">{company.email}</p>}
+          {company.phone && <p>{company.phone}</p>}
+          {company.taxId && <p className="mt-1">Tax ID: {company.taxId}</p>}
+          {company.vatNumber && <p>VAT: {company.vatNumber}</p>}
         </div>
       </div>
       

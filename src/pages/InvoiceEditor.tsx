@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useInvoices } from '@/context/InvoicesContext';
 import InvoiceForm from '@/components/invoices/InvoiceForm';
 import { Invoice } from '@/types/invoice';
 import { toast } from 'sonner';
+import { useTemplates } from '@/context/TemplatesContext';
 
 const InvoiceEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,9 +14,17 @@ const InvoiceEditor: React.FC = () => {
   const templateId = searchParams.get('template');
   const navigate = useNavigate();
   const { addInvoice, updateInvoice, getInvoiceById } = useInvoices();
+  const { getTemplateById } = useTemplates();
   
   const isNewInvoice = !id || id === 'new';
   const invoice = !isNewInvoice ? getInvoiceById(id) : undefined;
+  
+  // Validate the template ID exists
+  useEffect(() => {
+    if (templateId && !getTemplateById(templateId)) {
+      toast.error('Selected template not found');
+    }
+  }, [templateId, getTemplateById]);
   
   const handleSubmit = (data: Invoice) => {
     if (isNewInvoice) {

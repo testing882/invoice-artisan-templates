@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -106,7 +107,10 @@ interface UseInvoiceFormProps {
 }
 
 export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoiceFormProps) => {
-  // Set default values based on initial data or create new ones
+  // Find selected template if templateId is provided
+  const selectedTemplate = templateId ? templates.find(t => t.id === templateId) : undefined;
+  
+  // Set default values based on initial data, selected template, or create new ones
   const defaultValues = initialData ? {
     invoiceNumber: initialData.invoiceNumber,
     date: initialData.date,
@@ -120,7 +124,7 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     invoiceNumber: generateInvoiceNumber(),
     date: new Date(),
     dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
-    companyId: "your-company",
+    companyId: selectedTemplate?.id || "your-company",
     client: {
       name: '',
       address: '',
@@ -129,14 +133,37 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
       country: '',
     } as ClientInfo,
     items: [createEmptyItem()],
-    notes: '',
-    taxRate: 0,
+    notes: selectedTemplate?.notes || '',
+    taxRate: selectedTemplate?.isEU ? 20 : 0, // Default tax rate for EU companies
   };
   
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
     defaultValues,
   });
+  
+  // Set form values when template is selected
+  useEffect(() => {
+    if (selectedTemplate && !initialData) {
+      // Update form values based on selected template
+      form.setValue('companyId', selectedTemplate.id);
+      
+      // Set default description to first item if available
+      if (form.getValues('items').length > 0 && selectedTemplate.description) {
+        form.setValue('items.0.description', selectedTemplate.description);
+      }
+      
+      // Set notes if available
+      if (selectedTemplate.notes) {
+        form.setValue('notes', selectedTemplate.notes);
+      }
+      
+      // Set tax rate if EU
+      if (selectedTemplate.isEU) {
+        form.setValue('taxRate', 20); // Default EU VAT rate
+      }
+    }
+  }, [selectedTemplate, form, initialData]);
   
   const watchedItems = form.watch('items');
   const watchedTaxRate = form.watch('taxRate');
