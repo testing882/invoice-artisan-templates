@@ -5,7 +5,8 @@ import {
   fetchTemplates, 
   addTemplateToDatabase, 
   updateTemplateInDatabase, 
-  deleteTemplateFromDatabase 
+  deleteTemplateFromDatabase,
+  sampleTemplates 
 } from '@/api/templateApi';
 
 export const useTemplatesData = () => {
