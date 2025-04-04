@@ -39,8 +39,13 @@ const BulkInvoicesPage: React.FC = () => {
 
   React.useEffect(() => {
     if (templates.length > 0 && companies.length === 0) {
+      // Sort templates alphabetically by name before setting companies state
+      const sortedTemplates = [...templates].sort((a, b) => 
+        a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+      );
+      
       setCompanies(
-        templates.map((template) => ({
+        sortedTemplates.map((template) => ({
           template,
           amount: '',
         }))
