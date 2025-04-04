@@ -51,10 +51,19 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
   });
 
   const handleSubmit = (values: TemplateFormValues) => {
-    onSubmit({
+    const template: CompanyTemplate = {
       id: initialData?.id || crypto.randomUUID(),
-      ...values,
-    });
+      name: values.name,
+      address: values.address,
+      city: values.city,
+      postalCode: values.postalCode,
+      country: values.country,
+      phone: values.phone,
+      email: values.email,
+      taxId: values.taxId,
+      logo: values.logo,
+    };
+    onSubmit(template);
   };
 
   return (

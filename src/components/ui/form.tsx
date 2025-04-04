@@ -9,7 +9,6 @@ import {
   FieldValues,
   FormProvider,
   useFormContext,
-  useFieldArray,
   UseFormReturn,
 } from "react-hook-form"
 
@@ -176,5 +175,4 @@ export {
   FormDescription,
   FormMessage,
   FormField,
-  useFieldArray,
 }

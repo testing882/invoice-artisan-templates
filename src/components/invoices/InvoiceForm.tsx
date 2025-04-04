@@ -11,8 +11,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  useFieldArray,
 } from "@/components/ui/form";
+import { useFieldArray } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -91,7 +91,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
   };
   
   // Set default values based on initial data or create new ones
-  const defaultValues: InvoiceFormValues = initialData ? {
+  const defaultValues = initialData ? {
     invoiceNumber: initialData.invoiceNumber,
     date: initialData.date,
     dueDate: initialData.dueDate,
@@ -151,7 +151,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
       }
     });
     
-    const calculatedSubtotal = calculateInvoiceTotal(calculatedItems);
+    const calculatedSubtotal = calculateInvoiceTotal(calculatedItems as InvoiceItem[]);
     setSubtotal(calculatedSubtotal);
     
     const calculatedTaxAmount = calculateTax(calculatedSubtotal, watchedTaxRate || 0);
@@ -179,11 +179,15 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
       date: values.date,
       dueDate: values.dueDate,
       company: selectedCompany,
-      client: values.client,
+      client: values.client as ClientInfo,
       items: values.items.map(item => ({
         ...item,
-        amount: calculateItemAmount(item)
-      })),
+        amount: calculateItemAmount(item),
+        id: item.id || crypto.randomUUID(),
+        description: item.description,
+        quantity: item.quantity,
+        rate: item.rate
+      })) as InvoiceItem[],
       notes: values.notes,
       terms: values.terms,
       totalAmount: subtotal,
