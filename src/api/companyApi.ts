@@ -17,8 +17,9 @@ export const fetchCompanyDetails = async (): Promise<CompanyInfo | null> => {
     }
     
     // Fetch company details for the current user
+    // Using 'from' with a cast to any to bypass type checking for the table name
     const { data, error } = await supabase
-      .from('company_settings')
+      .from('company_settings' as any)
       .select('*')
       .eq('user_id', userId)
       .maybeSingle();
@@ -62,7 +63,7 @@ export const saveCompanyToDatabase = async (company: CompanyInfo): Promise<void>
     
     // First check if company details exist for this user
     const { data, error: fetchError } = await supabase
-      .from('company_settings')
+      .from('company_settings' as any)
       .select('id')
       .eq('user_id', userId)
       .maybeSingle();
@@ -74,7 +75,7 @@ export const saveCompanyToDatabase = async (company: CompanyInfo): Promise<void>
     if (data) {
       // Update existing company details
       const { error } = await supabase
-        .from('company_settings')
+        .from('company_settings' as any)
         .update({
           ...supabaseCompany,
           user_id: userId
@@ -87,11 +88,11 @@ export const saveCompanyToDatabase = async (company: CompanyInfo): Promise<void>
     } else {
       // Insert new company details
       const { error } = await supabase
-        .from('company_settings')
+        .from('company_settings' as any)
         .insert({
           ...supabaseCompany,
           user_id: userId
-        });
+        } as any);
       
       if (error) {
         throw error;
