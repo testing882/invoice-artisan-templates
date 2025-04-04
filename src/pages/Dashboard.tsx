@@ -8,6 +8,7 @@ import { useInvoices } from '@/context/InvoicesContext';
 import { useTemplates } from '@/context/TemplatesContext';
 import { formatCurrency } from '@/lib/invoice-utils';
 import { format } from 'date-fns';
+import { MonthlyInvoiceChart } from '@/components/dashboard/MonthlyInvoiceChart';
 
 const Dashboard: React.FC = () => {
   const { invoices } = useInvoices();
@@ -62,6 +63,9 @@ const Dashboard: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Monthly Invoice Chart */}
+      <MonthlyInvoiceChart invoices={invoices} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="col-span-1">
