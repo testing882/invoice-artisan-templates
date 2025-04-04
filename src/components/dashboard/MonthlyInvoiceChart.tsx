@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Invoice } from '@/types/invoice';
 import { formatCurrency } from '@/lib/invoice-utils';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer } from '@/components/ui/chart';
 
 interface MonthlyInvoiceChartProps {
   invoices: Invoice[];
@@ -69,6 +69,18 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
     },
   };
 
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip border rounded-md shadow-md bg-background p-2 text-sm">
+          <p className="text-xs text-muted-foreground">{payload[0].payload.month}</p>
+          <p className="font-bold text-foreground">{formatCurrency(payload[0].value as number)}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <Card className="col-span-1 md:col-span-2">
       <CardHeader>
@@ -95,28 +107,7 @@ export const MonthlyInvoiceChart: React.FC<MonthlyInvoiceChartProps> = ({ invoic
                 axisLine={false}
                 tick={{ fill: '#888888' }}
               />
-              <Tooltip 
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <ChartTooltipContent
-                        className="border-none bg-background shadow-md"
-                        content={
-                          <div className="flex flex-col gap-0.5">
-                            <span className="text-xs text-muted-foreground">
-                              {payload[0].payload.month}
-                            </span>
-                            <span className="font-bold text-foreground">
-                              {formatCurrency(payload[0].value as number)}
-                            </span>
-                          </div>
-                        }
-                      />
-                    )
-                  }
-                  return null
-                }}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Bar 
                 dataKey="value" 
                 name="invoices"
