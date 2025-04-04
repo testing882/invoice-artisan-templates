@@ -4,8 +4,24 @@ import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { getCurrentUserId } from './supabase';
 
-// Database types for invoices
-export type SupabaseInvoice = Database['public']['Tables']['invoices']['Row'];
+// Define a new type for invoices since it's now in Supabase
+// This is a workaround since we can't directly modify the generated types
+type SupabaseInvoice = {
+  id: string;
+  user_id: string;
+  invoice_number: string;
+  company: any;
+  client: any;
+  items: any;
+  notes: string | null;
+  status: string;
+  date: string;
+  due_date: string;
+  total_amount: number;
+  tax_rate: number | null;
+  tax_amount: number | null;
+  created_at: string;
+};
 
 // Convert snake_case from DB to camelCase for frontend
 export const mapInvoiceFromSupabase = (invoice: SupabaseInvoice): Invoice => ({
