@@ -3,7 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CompanyTemplate } from '@/types/invoice';
 import { toast } from 'sonner';
 import { STORAGE_KEYS } from './types';
-import { supabase, mapTemplateFromSupabase, mapTemplateToSupabase, getCurrentUserId } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import { mapTemplateFromSupabase, mapTemplateToSupabase, getCurrentUserId } from '@/lib/supabase';
 
 interface TemplatesContextType {
   templates: CompanyTemplate[];
