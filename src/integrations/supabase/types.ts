@@ -114,10 +114,12 @@ export type Database = {
           is_eu: boolean | null
           logo: string | null
           name: string
+          notes: string | null
           phone: string | null
           postal_code: string
           tax_id: string | null
           user_id: string | null
+          vat_number: string | null
         }
         Insert: {
           address: string
@@ -130,10 +132,12 @@ export type Database = {
           is_eu?: boolean | null
           logo?: string | null
           name: string
+          notes?: string | null
           phone?: string | null
           postal_code: string
           tax_id?: string | null
           user_id?: string | null
+          vat_number?: string | null
         }
         Update: {
           address?: string
@@ -146,10 +150,12 @@ export type Database = {
           is_eu?: boolean | null
           logo?: string | null
           name?: string
+          notes?: string | null
           phone?: string | null
           postal_code?: string
           tax_id?: string | null
           user_id?: string | null
+          vat_number?: string | null
         }
         Relationships: []
       }

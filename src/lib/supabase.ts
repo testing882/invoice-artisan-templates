@@ -1,13 +1,29 @@
 
 import { CompanyTemplate } from '@/types/invoice';
 import { supabase } from '@/integrations/supabase/client';
-import { Database } from '@/integrations/supabase/types';
 
 // Export supabase client
 export { supabase };
 
-// Database types
-export type SupabaseTemplate = Database['public']['Tables']['templates']['Row'];
+// Database types - use a type that matches the actual database schema
+export type SupabaseTemplate = {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  postal_code: string;
+  country: string;
+  phone: string | null;
+  email: string | null;
+  tax_id: string | null;
+  description: string | null;
+  logo: string | null;
+  notes: string | null;
+  is_eu: boolean;
+  vat_number: string | null;
+  created_at: string;
+  user_id: string;
+};
 
 // Convert snake_case from DB to camelCase for frontend
 export const mapTemplateFromSupabase = (template: SupabaseTemplate): CompanyTemplate => ({
