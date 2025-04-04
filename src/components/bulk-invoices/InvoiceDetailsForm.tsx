@@ -100,10 +100,12 @@ const InvoiceDetailsForm: React.FC<InvoiceDetailsFormProps> = ({
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">
+            Global Description <span className="text-sm text-muted-foreground">(optional - overrides template descriptions)</span>
+          </Label>
           <Textarea
             id="description"
-            placeholder="Enter service or product description"
+            placeholder="Enter service or product description (will override template descriptions)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="resize-none h-[80px]"

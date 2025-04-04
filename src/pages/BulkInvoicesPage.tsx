@@ -15,8 +15,12 @@ const BulkInvoicesPage: React.FC = () => {
   const { addInvoice } = useInvoices();
   const [date, setDate] = useState<Date>(new Date());
   const [dueDate, setDueDate] = useState<Date>(new Date());
-  const [description, setDescription] = useState<string>('');
-  const [companies, setCompanies] = useState<{ template: CompanyTemplate; amount: string }[]>([]);
+  const [globalDescription, setGlobalDescription] = useState<string>('');
+  const [companies, setCompanies] = useState<{ 
+    template: CompanyTemplate; 
+    amount: string;
+    description: string; 
+  }[]>([]);
 
   useEffect(() => {
     if (templates.length > 0 && companies.length === 0) {
@@ -29,6 +33,7 @@ const BulkInvoicesPage: React.FC = () => {
         sortedTemplates.map((template) => ({
           template,
           amount: '',
+          description: template.description || '',
         }))
       );
     }
@@ -40,12 +45,13 @@ const BulkInvoicesPage: React.FC = () => {
     setCompanies(newCompanies);
   };
 
-  const handleGenerateInvoices = () => {
-    if (!description.trim()) {
-      toast.error('Please enter a description for the invoices');
-      return;
-    }
+  const handleDescriptionChange = (index: number, value: string) => {
+    const newCompanies = [...companies];
+    newCompanies[index].description = value;
+    setCompanies(newCompanies);
+  };
 
+  const handleGenerateInvoices = () => {
     const validCompanies = companies.filter(
       (company) => company.amount && !isNaN(parseFloat(company.amount)) && parseFloat(company.amount) > 0
     );
@@ -60,9 +66,14 @@ const BulkInvoicesPage: React.FC = () => {
     validCompanies.forEach((company) => {
       const amount = parseFloat(company.amount);
       
+      // Use global description if provided, otherwise use company-specific description
+      const itemDescription = globalDescription.trim() 
+        ? globalDescription 
+        : company.description;
+      
       const invoiceItem = {
         id: crypto.randomUUID(),
-        description: description,
+        description: itemDescription,
         quantity: 1,
         rate: amount,
         amount: amount,
@@ -114,13 +125,14 @@ const BulkInvoicesPage: React.FC = () => {
           setDate={setDate}
           dueDate={dueDate}
           setDueDate={setDueDate}
-          description={description}
-          setDescription={setDescription}
+          description={globalDescription}
+          setDescription={setGlobalDescription}
         />
 
         <CompanyAmountsTable 
           companies={companies}
           onAmountChange={handleAmountChange}
+          onDescriptionChange={handleDescriptionChange}
           onGenerateInvoices={handleGenerateInvoices}
         />
       </div>

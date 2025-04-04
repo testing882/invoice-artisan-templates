@@ -15,17 +15,20 @@ import {
 interface CompanyAmountEntry {
   template: CompanyTemplate;
   amount: string;
+  description: string;
 }
 
 interface CompanyAmountsTableProps {
   companies: CompanyAmountEntry[];
   onAmountChange: (index: number, value: string) => void;
+  onDescriptionChange: (index: number, value: string) => void;
   onGenerateInvoices: () => void;
 }
 
 const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
   companies,
   onAmountChange,
+  onDescriptionChange,
   onGenerateInvoices,
 }) => {
   // Sort companies alphabetically by name
@@ -44,8 +47,9 @@ const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-1/2">Company</TableHead>
-                <TableHead className="w-1/2">Amount</TableHead>
+                <TableHead className="w-1/4">Company</TableHead>
+                <TableHead className="w-1/2">Description</TableHead>
+                <TableHead className="w-1/4">Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -54,6 +58,18 @@ const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
                   <TableRow key={company.template.id}>
                     <TableCell className="font-medium">
                       {company.template.name}
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={company.description}
+                        onChange={(e) => onDescriptionChange(
+                          // Find the original index in companies array
+                          companies.findIndex(c => c.template.id === company.template.id),
+                          e.target.value
+                        )}
+                        placeholder="Description of services"
+                        className="w-full"
+                      />
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
@@ -76,7 +92,7 @@ const CompanyAmountsTable: React.FC<CompanyAmountsTableProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center py-10">
+                  <TableCell colSpan={3} className="text-center py-10">
                     No company templates available. Create templates first.
                   </TableCell>
                 </TableRow>
