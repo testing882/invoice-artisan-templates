@@ -36,7 +36,7 @@ export const generateInvoiceNumber = (): string => {
   return `${prefix}-${date}-${random}`;
 };
 
-export const exportToPdf = (invoice: Invoice): void => {
+export const exportToPdf = (invoice: Invoice): jsPDF => {
   const doc = new jsPDF();
   
   // Add company details
@@ -188,4 +188,3 @@ export const generateZipFilename = (invoices: Invoice[]): string => {
   
   return `${filename}.zip`;
 };
-

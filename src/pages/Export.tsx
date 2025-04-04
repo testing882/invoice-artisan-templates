@@ -11,6 +11,7 @@ import FilterSection from '@/components/export/FilterSection';
 import InvoiceTable from '@/components/export/InvoiceTable';
 import DeleteInvoiceDialog from '@/components/invoices/DeleteInvoiceDialog';
 import { useTemplates } from '@/context/TemplatesContext';
+import { Invoice } from '@/types/invoice';
 
 const Export: React.FC = () => {
   const navigate = useNavigate();
