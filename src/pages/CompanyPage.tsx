@@ -1,155 +1,121 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Button } from '@/components/ui/button';
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-const companySchema = z.object({
-  name: z.string().min(1, 'Company name is required'),
-  street: z.string().min(1, 'Street is required'),
-  city: z.string().min(1, 'City is required'),
-  zipCode: z.string().min(1, 'Zip code is required'),
-  country: z.string().min(1, 'Country is required'),
-  email: z.string().email('Valid email is required'),
-});
-
-type CompanyFormValues = z.infer<typeof companySchema>;
-
 const CompanyPage: React.FC = () => {
-  const form = useForm<CompanyFormValues>({
-    resolver: zodResolver(companySchema),
-    defaultValues: {
-      name: localStorage.getItem('company_name') || '',
-      street: localStorage.getItem('company_street') || '',
-      city: localStorage.getItem('company_city') || '',
-      zipCode: localStorage.getItem('company_zipCode') || '',
-      country: localStorage.getItem('company_country') || '',
-      email: localStorage.getItem('company_email') || '',
-    },
-  });
+  const [companyName, setCompanyName] = useState('');
+  const [companyStreet, setCompanyStreet] = useState('');
+  const [companyCity, setCompanyCity] = useState('');
+  const [companyZipCode, setCompanyZipCode] = useState('');
+  const [companyCountry, setCompanyCountry] = useState('');
+  const [companyEmail, setCompanyEmail] = useState('');
 
-  const onSubmit = (data: CompanyFormValues) => {
-    localStorage.setItem('company_name', data.name);
-    localStorage.setItem('company_street', data.street);
-    localStorage.setItem('company_city', data.city);
-    localStorage.setItem('company_zipCode', data.zipCode);
-    localStorage.setItem('company_country', data.country);
-    localStorage.setItem('company_email', data.email);
+  useEffect(() => {
+    // Load existing values from localStorage
+    setCompanyName(localStorage.getItem('company_name') || '');
+    setCompanyStreet(localStorage.getItem('company_street') || '');
+    setCompanyCity(localStorage.getItem('company_city') || '');
+    setCompanyZipCode(localStorage.getItem('company_zipCode') || '');
+    setCompanyCountry(localStorage.getItem('company_country') || '');
+    setCompanyEmail(localStorage.getItem('company_email') || '');
+  }, []);
+
+  const handleSave = () => {
+    // Save values to localStorage
+    localStorage.setItem('company_name', companyName);
+    localStorage.setItem('company_street', companyStreet);
+    localStorage.setItem('company_city', companyCity);
+    localStorage.setItem('company_zipCode', companyZipCode);
+    localStorage.setItem('company_country', companyCountry);
+    localStorage.setItem('company_email', companyEmail);
     
-    // Also store combined address for backwards compatibility
-    const fullAddress = `${data.street}, ${data.city}, ${data.zipCode}, ${data.country}`;
-    localStorage.setItem('company_address', fullAddress);
-    
-    toast.success('Company information updated');
+    toast.success('Company information saved successfully');
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-invoice-darkGray">Your Company Information</h1>
+      <h1 className="text-3xl font-bold text-invoice-darkGray">Your Company</h1>
       
       <Card>
         <CardHeader>
-          <CardTitle>Company Details</CardTitle>
+          <CardTitle>Company Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Company Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="company-name">Company Name</Label>
+              <Input 
+                id="company-name"
+                placeholder="Your company name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
               />
-              
-              <FormField
-                control={form.control}
-                name="street"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Street</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="company-street">Street Address</Label>
+              <Input 
+                id="company-street"
+                placeholder="Street address"
+                value={companyStreet}
+                onChange={(e) => setCompanyStreet(e.target.value)}
               />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="city"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>City</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="zipCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Zip Code</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="company-city">City</Label>
+                <Input 
+                  id="company-city"
+                  placeholder="City"
+                  value={companyCity}
+                  onChange={(e) => setCompanyCity(e.target.value)}
                 />
               </div>
               
-              <FormField
-                control={form.control}
-                name="country"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+              <div className="space-y-2">
+                <Label htmlFor="company-zip">Zip/Postal Code</Label>
+                <Input 
+                  id="company-zip"
+                  placeholder="Zip or postal code"
+                  value={companyZipCode}
+                  onChange={(e) => setCompanyZipCode(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="company-country">Country</Label>
+              <Input 
+                id="company-country"
+                placeholder="Country"
+                value={companyCountry}
+                onChange={(e) => setCompanyCountry(e.target.value)}
               />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="company-email">Email</Label>
+              <Input 
+                id="company-email"
+                type="email"
+                placeholder="company@example.com"
+                value={companyEmail}
+                onChange={(e) => setCompanyEmail(e.target.value)}
               />
-              
-              <Button type="submit" className="bg-invoice-blue hover:bg-invoice-darkBlue">
-                Save Company Information
-              </Button>
-            </form>
-          </Form>
+            </div>
+            
+            <Button 
+              className="bg-invoice-blue hover:bg-invoice-darkBlue w-full"
+              onClick={handleSave}
+            >
+              Save Company Information
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

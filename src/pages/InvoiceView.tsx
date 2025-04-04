@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -186,21 +187,10 @@ const InvoiceView: React.FC = () => {
             </div>
           </div>
           
-          {(invoice.notes || invoice.terms) && (
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {invoice.notes && (
-                <div>
-                  <h3 className="font-medium text-invoice-gray mb-2">Notes</h3>
-                  <p className="text-invoice-darkGray">{invoice.notes}</p>
-                </div>
-              )}
-              
-              {invoice.terms && (
-                <div>
-                  <h3 className="font-medium text-invoice-gray mb-2">Terms & Conditions</h3>
-                  <p className="text-invoice-darkGray">{invoice.terms}</p>
-                </div>
-              )}
+          {invoice.notes && (
+            <div className="mt-8">
+              <h3 className="font-medium text-invoice-gray mb-2">Notes</h3>
+              <p className="text-invoice-darkGray">{invoice.notes}</p>
             </div>
           )}
         </CardContent>

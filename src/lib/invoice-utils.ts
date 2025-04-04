@@ -107,19 +107,12 @@ export const exportToPdf = (invoice: Invoice): void => {
     doc.text(`${formatCurrency(invoice.totalAmount + invoice.taxAmount)}`, 170, finalY + 24, { align: 'right' });
   }
   
-  // Add notes & terms
+  // Add notes
   if (invoice.notes) {
     doc.setFontSize(11);
     doc.text('Notes:', 14, finalY + 40);
     doc.setFontSize(9);
     doc.text(invoice.notes, 14, finalY + 47);
-  }
-  
-  if (invoice.terms) {
-    doc.setFontSize(11);
-    doc.text('Terms & Conditions:', 14, finalY + 60);
-    doc.setFontSize(9);
-    doc.text(invoice.terms, 14, finalY + 67);
   }
   
   doc.save(`Invoice-${invoice.invoiceNumber}.pdf`);
