@@ -5,10 +5,7 @@ import { Database } from '@/integrations/supabase/types';
 import { getCurrentUserId } from './supabase';
 
 // Define a type for invoices from Supabase
-export type SupabaseInvoice = Database['public']['Tables']['invoices']['Row'] & {
-  deleted?: boolean;
-  deleted_at?: string;
-};
+export type SupabaseInvoice = Database['public']['Tables']['invoices']['Row'];
 
 // Convert snake_case from DB to camelCase for frontend
 export const mapInvoiceFromSupabase = (invoice: SupabaseInvoice): Invoice => ({
