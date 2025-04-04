@@ -32,7 +32,8 @@ export const fetchCompanyDetails = async (): Promise<CompanyInfo | null> => {
     
     if (data) {
       // Map company from Supabase format to application format
-      return mapCompanyFromSupabase(data as SupabaseCompanySettings);
+      // Use type assertion to tell TypeScript about the expected shape
+      return mapCompanyFromSupabase(data as unknown as SupabaseCompanySettings);
     } else {
       // Return null if no company found
       console.log('No company details found, returning null');
@@ -80,7 +81,7 @@ export const saveCompanyToDatabase = async (company: CompanyInfo): Promise<void>
           ...supabaseCompany,
           user_id: userId
         })
-        .eq('id', data.id);
+        .eq('id', (data as any).id);
       
       if (error) {
         throw error;
