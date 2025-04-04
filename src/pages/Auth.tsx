@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { LoaderCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const Auth: React.FC = () => {
   const { signIn, signUp, user, loading } = useAuth();
@@ -16,6 +18,10 @@ const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [activeTab, setActiveTab] = useState('login');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetInProgress, setResetInProgress] = useState(false);
 
   // If user is already logged in, redirect to home
   if (user && !loading) {
@@ -47,6 +53,7 @@ const Auth: React.FC = () => {
       if (error) {
         toast.error(error.message || 'Failed to sign up');
       } else {
+        setSuccessMessage('Account created successfully! Please check your email for verification.');
         toast.success('Signed up successfully! Please check your email for verification.');
         setActiveTab('login');
       }
@@ -54,6 +61,26 @@ const Auth: React.FC = () => {
       toast.error(error.message || 'Failed to sign up');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetInProgress(true);
+    
+    try {
+      const { error } = await useAuth().resetPassword(resetEmail);
+      if (error) {
+        toast.error(error.message || 'Failed to send reset password email');
+      } else {
+        toast.success('Password reset email sent. Please check your inbox.');
+        setShowForgotPassword(false);
+        setResetEmail('');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to send reset password email');
+    } finally {
+      setResetInProgress(false);
     }
   };
 
@@ -75,6 +102,14 @@ const Auth: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {successMessage && (
+            <Alert className="mb-6 bg-green-50 border-green-200">
+              <AlertDescription className="text-center text-green-700 font-medium">
+                {successMessage}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login">Sign In</TabsTrigger>
@@ -114,6 +149,15 @@ const Auth: React.FC = () => {
                   ) : null}
                   Sign In
                 </Button>
+                <div className="text-center">
+                  <button 
+                    type="button" 
+                    className="text-sm text-blue-600 hover:underline"
+                    onClick={() => setShowForgotPassword(true)}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
               </form>
             </TabsContent>
 
@@ -160,6 +204,48 @@ const Auth: React.FC = () => {
           </div>
         </CardFooter>
       </Card>
+
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reset Your Password</DialogTitle>
+            <DialogDescription>
+              Enter your email address and we'll send you a link to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword} className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="reset-email">Email</Label>
+              <Input 
+                id="reset-email" 
+                type="email" 
+                placeholder="name@example.com" 
+                required 
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowForgotPassword(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                disabled={resetInProgress}
+              >
+                {resetInProgress ? (
+                  <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                Send Reset Link
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
