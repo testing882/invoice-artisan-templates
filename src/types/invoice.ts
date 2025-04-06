@@ -30,6 +30,7 @@ export interface ClientInfo {
   city: string;
   postalCode: string;
   country: string;
+  vatNumber?: string; // Add the vatNumber property
 }
 
 export interface CompanyInfo {
