@@ -49,6 +49,8 @@ const InvoicePartyInfo: React.FC<InvoicePartyInfoProps> = ({
           </p>
         )}
         {client.country && <p>{client.country}</p>}
+        {/* Display VAT number if it exists */}
+        {client.vatNumber && <p className="mt-1">VAT: {client.vatNumber}</p>}
       </div>
     );
   };

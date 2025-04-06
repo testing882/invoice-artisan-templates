@@ -106,9 +106,14 @@ const BulkInvoicesPage: React.FC = () => {
         date: date,
         dueDate: dueDate,
         company: yourCompany,
-        client: company.template as ClientInfo,
+        client: {
+          ...company.template,
+          // Make sure to include VAT number from the template
+          vatNumber: company.template.vatNumber
+        } as ClientInfo,
         items: [invoiceItem],
-        notes: '',
+        // Include notes from the template if they exist
+        notes: company.template.notes || '',
         totalAmount: amount,
         status: 'paid', // Always set status to paid for all invoices
       };

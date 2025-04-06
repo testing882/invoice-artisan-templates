@@ -91,6 +91,12 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
     yPos += 7;
   }
   
+  // Add VAT number if it exists
+  if (invoice.company?.vatNumber) {
+    doc.text(`VAT: ${invoice.company.vatNumber}`, 14, yPos);
+    yPos += 7;
+  }
+  
   // Client info
   doc.setFontSize(12);
   doc.text('Bill To:', 120, 66);
@@ -123,6 +129,13 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   
   if (invoice.client.country) {
     doc.text(invoice.client.country, 120, yPos);
+    yPos += 7;
+  }
+  
+  // Add VAT number for client if it exists
+  if (invoice.client.vatNumber) {
+    doc.text(`VAT: ${invoice.client.vatNumber}`, 120, yPos);
+    yPos += 7;
   }
   
   // Invoice items
