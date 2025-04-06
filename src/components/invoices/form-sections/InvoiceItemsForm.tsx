@@ -1,207 +1,69 @@
 
-import React, { useEffect } from 'react';
-import { UseFormReturn, useFieldArray } from 'react-hook-form';
-import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import React from 'react';
+import { useFormContext, useFieldArray } from "react-hook-form";
+import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash } from 'lucide-react';
-import { InvoiceItem } from '@/types/invoice';
-import { formatCurrency, calculateItemAmount } from '@/lib/invoice-utils';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { formatCurrency } from '@/lib/invoice-utils';
 import { InvoiceFormValues } from '@/hooks/useInvoiceForm';
 
 interface InvoiceItemsFormProps {
-  form: UseFormReturn<InvoiceFormValues>;
+  form: any;
   subtotal: number;
   taxAmount: number;
   total: number;
 }
 
-const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({ 
-  form, 
-  subtotal, 
-  taxAmount, 
-  total 
-}) => {
-  const { fields, append, remove } = useFieldArray({
-    name: "items",
-    control: form.control,
-  });
+const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({ form, subtotal, taxAmount, total }) => {
+  const { control, register, formState: { errors } } = useFormContext<InvoiceFormValues>();
   
-  const handleAddItem = () => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  });
+
+  // Create a new empty item
+  const addNewItem = () => {
     append({
       id: crypto.randomUUID(),
-      description: '',
+      description: "",
       quantity: 1,
       rate: 0,
       amount: 0,
     });
   };
-
-  useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      if (name && (name.includes('.quantity') || name.includes('.rate'))) {
-        const fieldIndex = parseInt(name.split('.')[1]);
-        
-        if (!isNaN(fieldIndex) && value.items && value.items[fieldIndex]) {
-          const item = value.items[fieldIndex];
-          const quantity = Number(item.quantity) || 0;
-          const rate = Number(item.rate) || 0;
-          const newAmount = quantity * rate;
-          
-          // Convert number to any to avoid type mismatch
-          form.setValue(`items.${fieldIndex}.amount`, newAmount as any);
-        }
-      }
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [form]);
-
+  
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Invoice Items</h2>
-        <Button 
-          type="button" 
-          onClick={handleAddItem}
-          className="bg-invoice-blue hover:bg-invoice-darkBlue"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Item
-        </Button>
-      </div>
+    <div className="p-6 bg-white rounded-lg border shadow-sm space-y-6">
+      <h2 className="text-xl font-semibold">Invoice Items</h2>
       
-      <div className="overflow-x-auto">
-        <table className="w-full invoice-table">
-          <thead>
-            <tr>
-              <th style={{ width: '50%' }}>Description</th>
-              <th>Quantity</th>
-              <th>Rate</th>
-              <th>Amount</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {fields.map((item, index) => (
-              <tr key={item.id}>
-                <td>
-                  <FormField
-                    control={form.control}
-                    name={`items.${index}.description`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </td>
-                <td>
-                  <FormField
-                    control={form.control}
-                    name={`items.${index}.quantity`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            step="0.01" 
-                            min="0" 
-                            {...field} 
-                            onChange={(e) => {
-                              field.onChange(e);
-                              const quantity = parseFloat(e.target.value) || 0;
-                              const rate = parseFloat(form.getValues(`items.${index}.rate`)) || 0;
-                              const amount = quantity * rate;
-                              // Convert to any to avoid TypeScript error
-                              form.setValue(`items.${index}.amount`, amount as any);
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </td>
-                <td>
-                  <FormField
-                    control={form.control}
-                    name={`items.${index}.rate`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input 
-                            type="number" 
-                            step="0.01" 
-                            min="0" 
-                            {...field} 
-                            onChange={(e) => {
-                              field.onChange(e);
-                              const rate = parseFloat(e.target.value) || 0;
-                              const quantity = parseFloat(form.getValues(`items.${index}.quantity`)) || 0;
-                              const amount = quantity * rate;
-                              // Convert to any to avoid TypeScript error
-                              form.setValue(`items.${index}.amount`, amount as any);
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </td>
-                <td>
-                  <FormField
-                    control={form.control}
-                    name={`items.${index}.amount`}
-                    render={({ field }) => (
-                      <div className="pt-2 text-invoice-darkGray">
-                        {formatCurrency(field.value)}
-                      </div>
-                    )}
-                  />
-                </td>
-                <td>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => fields.length > 1 && remove(index)}
-                    disabled={fields.length <= 1}
-                  >
-                    <Trash className="w-4 h-4 text-red-500" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      
-      <div className="mt-4 flex justify-end">
-        <div className="w-64 space-y-2">
-          <div className="flex justify-between">
-            <span>Subtotal:</span>
-            <span>{formatCurrency(subtotal)}</span>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span>Tax Rate:</span>
-            <div className="w-20">
+      <div className="space-y-4">
+        {/* Header row */}
+        <div className="grid grid-cols-12 gap-4 font-semibold text-sm text-invoice-darkGray">
+          <div className="col-span-5">Description</div>
+          <div className="col-span-2">Quantity</div>
+          <div className="col-span-2">Rate</div>
+          <div className="col-span-2">Amount</div>
+          <div className="col-span-1"></div>
+        </div>
+        
+        {/* Item rows */}
+        {fields.map((field, index) => (
+          <div key={field.id} className="grid grid-cols-12 gap-4 items-start">
+            {/* Description */}
+            <div className="col-span-5">
               <FormField
-                control={form.control}
-                name="taxRate"
+                control={control}
+                name={`items.${index}.description`}
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.01" 
-                        min="0" 
+                      <Textarea 
                         {...field} 
+                        className="resize-none h-[80px]" 
+                        placeholder="Enter item description"
                       />
                     </FormControl>
                     <FormMessage />
@@ -209,17 +71,147 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                 )}
               />
             </div>
-            <span>%</span>
+            
+            {/* Quantity */}
+            <div className="col-span-2">
+              <FormField
+                control={control}
+                name={`items.${index}.quantity`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Qty"
+                        // Convert to string for the input value
+                        value={field.value.toString()}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            {/* Rate */}
+            <div className="col-span-2">
+              <FormField
+                control={control}
+                name={`items.${index}.rate`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="Rate"
+                        // Convert to string for the input value
+                        value={field.value.toString()}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            {/* Amount (calculated) */}
+            <div className="col-span-2">
+              <FormField
+                control={control}
+                name={`items.${index}.amount`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input 
+                        {...field} 
+                        disabled
+                        className="bg-gray-50 cursor-not-allowed"
+                        value={formatCurrency(field.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            {/* Delete button */}
+            <div className="col-span-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-destructive"
+                onClick={() => {
+                  if (fields.length > 1) {
+                    remove(index);
+                  }
+                }}
+                disabled={fields.length <= 1}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          
-          <div className="flex justify-between">
-            <span>Tax:</span>
-            <span>{formatCurrency(taxAmount)}</span>
-          </div>
-          
-          <div className="flex justify-between font-bold pt-2 border-t">
-            <span>Total:</span>
-            <span>{formatCurrency(total)}</span>
+        ))}
+        
+        {/* Add item button */}
+        <Button
+          type="button"
+          variant="outline"
+          className="mt-2"
+          onClick={addNewItem}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Item
+        </Button>
+        
+        {/* Tax and total section */}
+        <div className="mt-6 border-t pt-4">
+          <div className="flex justify-end">
+            <div className="w-64 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-invoice-gray">Subtotal:</span>
+                <span className="font-medium">{formatCurrency(subtotal)}</span>
+              </div>
+              
+              <FormField
+                control={control}
+                name="taxRate"
+                render={({ field }) => (
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <FormLabel className="m-0 text-invoice-gray">Tax Rate:</FormLabel>
+                      <FormControl>
+                        <div className="relative w-16">
+                          <Input
+                            {...field}
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            className="pr-6 text-right"
+                          />
+                          <span className="absolute right-2 top-1/2 -translate-y-1/2">%</span>
+                        </div>
+                      </FormControl>
+                    </div>
+                    <span className="font-medium">{formatCurrency(taxAmount)}</span>
+                  </div>
+                )}
+              />
+              
+              <div className="flex justify-between pt-2 border-t border-gray-200">
+                <span className="font-bold">Total:</span>
+                <span className="font-bold">{formatCurrency(total)}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

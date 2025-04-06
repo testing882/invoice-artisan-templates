@@ -174,7 +174,7 @@ const BulkInvoicesPage: React.FC = () => {
           dueDate={dueDate}
           setDueDate={setDueDate}
           description={globalDescription}
-          setDescription={setDescription}
+          setDescription={setGlobalDescription}
         />
 
         <CompanyAmountsTable 
