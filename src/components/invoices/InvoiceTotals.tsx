@@ -13,6 +13,9 @@ const InvoiceTotals: React.FC<InvoiceTotalsProps> = ({
   taxRate,
   taxAmount,
 }) => {
+  // Calculate total with tax if available
+  const grandTotal = taxAmount ? totalAmount + taxAmount : totalAmount;
+  
   return (
     <div className="mt-8 flex justify-end">
       <div className="w-64 space-y-2">
@@ -21,9 +24,16 @@ const InvoiceTotals: React.FC<InvoiceTotalsProps> = ({
           <span>{formatCurrency(totalAmount)}</span>
         </div>
         
+        {taxRate && taxAmount ? (
+          <div className="flex justify-between">
+            <span>Tax ({taxRate}%):</span>
+            <span>{formatCurrency(taxAmount)}</span>
+          </div>
+        ) : null}
+        
         <div className="flex justify-between">
           <span>Amount Paid:</span>
-          <span>{formatCurrency(totalAmount)}</span>
+          <span>{formatCurrency(grandTotal)}</span>
         </div>
       </div>
     </div>

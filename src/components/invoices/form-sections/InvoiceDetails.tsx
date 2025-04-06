@@ -22,7 +22,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({ form }) => {
   const { companyInfo, loading } = useCompany();
   
   useEffect(() => {
-    // Set the company ID in the form
+    // Set the company ID in the form to ensure it uses your company data
     form.setValue('companyId', 'your-company');
     console.log('Company info from context:', companyInfo);
   }, [form, companyInfo]);

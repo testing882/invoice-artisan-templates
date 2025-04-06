@@ -1,3 +1,4 @@
+
 import { Invoice, InvoiceItem } from '@/types/invoice';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -35,7 +36,7 @@ export const generateInvoiceNumber = (): string => {
 export const exportToPdf = (invoice: Invoice): jsPDF => {
   const doc = new jsPDF();
   
-  // Add company details
+  // Add invoice details
   doc.setFontSize(20);
   doc.text('INVOICE', 14, 22);
   
@@ -49,32 +50,45 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   doc.text('From:', 14, 66);
   doc.setFontSize(10);
   
-  // Always ensure company name is displayed, even if empty
-  doc.text(invoice.company.name || '', 14, 73);
+  // Always ensure company name is displayed
+  const companyName = invoice.company?.name || 'Your Company';
+  doc.text(companyName, 14, 73);
   
-  // Only add address if it exists
-  if (invoice.company.address) {
-    doc.text(invoice.company.address, 14, 80);
+  // Track current Y position
+  let yPos = 80;
+  
+  // Add address if it exists
+  if (invoice.company?.address) {
+    doc.text(invoice.company.address, 14, yPos);
+    yPos += 7;
   }
   
-  // Handle city and postal code carefully
+  // Handle city and postal code
   let cityPostalLine = '';
-  if (invoice.company.city) {
+  if (invoice.company?.city) {
     cityPostalLine += invoice.company.city;
-    if (invoice.company.postalCode) {
+    if (invoice.company?.postalCode) {
       cityPostalLine += `, ${invoice.company.postalCode}`;
     }
-  } else if (invoice.company.postalCode) {
+  } else if (invoice.company?.postalCode) {
     cityPostalLine = invoice.company.postalCode;
   }
   
   if (cityPostalLine) {
-    doc.text(cityPostalLine, 14, 87);
+    doc.text(cityPostalLine, 14, yPos);
+    yPos += 7;
   }
   
-  // Only add country if it exists
-  if (invoice.company.country) {
-    doc.text(invoice.company.country, 14, 94);
+  // Add country if it exists
+  if (invoice.company?.country) {
+    doc.text(invoice.company.country, 14, yPos);
+    yPos += 7;
+  }
+  
+  // Add email if it exists
+  if (invoice.company?.email) {
+    doc.text(invoice.company.email, 14, yPos);
+    yPos += 7;
   }
   
   // Client info
@@ -83,8 +97,12 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   doc.setFontSize(10);
   doc.text(invoice.client.name || '', 120, 73);
   
+  // Reset Y position for client info
+  yPos = 80;
+  
   if (invoice.client.address) {
-    doc.text(invoice.client.address, 120, 80);
+    doc.text(invoice.client.address, 120, yPos);
+    yPos += 7;
   }
   
   // Handle city and postal code carefully for client
@@ -99,11 +117,12 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   }
   
   if (clientCityPostalLine) {
-    doc.text(clientCityPostalLine, 120, 87);
+    doc.text(clientCityPostalLine, 120, yPos);
+    yPos += 7;
   }
   
   if (invoice.client.country) {
-    doc.text(invoice.client.country, 120, 94);
+    doc.text(invoice.client.country, 120, yPos);
   }
   
   // Invoice items
@@ -135,16 +154,29 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   // Get the final Y position after the table
   const finalY = (doc as any).lastAutoTable.finalY || 110;
   
-  // Add Subtotal and Amount Paid only (no Total)
-  // Making sure they align properly by using the same position for the labels
+  // Calculate total with tax if available
+  const totalWithTax = invoice.taxAmount ? invoice.totalAmount + invoice.taxAmount : invoice.totalAmount;
+  
+  // Add Subtotal, Tax (if applicable), and Amount Paid
   const labelX = 120; // Starting position for the labels
   const valueX = 170; // Position for the values (aligned right)
   
+  // Subtotal
   doc.text(`Subtotal:`, labelX, finalY + 10);
   doc.text(`${formatCurrency(invoice.totalAmount)}`, valueX, finalY + 10, { align: 'right' });
   
-  doc.text(`Amount Paid:`, labelX, finalY + 17);
-  doc.text(`${formatCurrency(invoice.totalAmount)}`, valueX, finalY + 17, { align: 'right' });
+  // Tax if available
+  let currentY = finalY + 10;
+  if (invoice.taxRate && invoice.taxAmount) {
+    currentY += 7;
+    doc.text(`Tax (${invoice.taxRate}%):`, labelX, currentY);
+    doc.text(`${formatCurrency(invoice.taxAmount)}`, valueX, currentY, { align: 'right' });
+  }
+  
+  // Amount Paid (Total)
+  currentY += 7;
+  doc.text(`Amount Paid:`, labelX, currentY);
+  doc.text(`${formatCurrency(totalWithTax)}`, valueX, currentY, { align: 'right' });
   
   // Add notes
   if (invoice.notes) {
