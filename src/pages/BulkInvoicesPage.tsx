@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInvoices } from '@/context/InvoicesContext';
 import { useTemplates } from '@/context/TemplatesContext';
+import { useCompany } from '@/context/CompanyContext';
 import { generateInvoiceNumber } from '@/lib/invoice-utils';
 import { CompanyTemplate, ClientInfo, Invoice } from '@/types/invoice';
 import { toast } from 'sonner';
@@ -13,6 +14,7 @@ const BulkInvoicesPage: React.FC = () => {
   const navigate = useNavigate();
   const { templates } = useTemplates();
   const { addInvoice } = useInvoices();
+  const { companyInfo } = useCompany();
   const [date, setDate] = useState<Date>(new Date());
   const [dueDate, setDueDate] = useState<Date>(new Date());
   const [globalDescription, setGlobalDescription] = useState<string>('');
@@ -51,60 +53,20 @@ const BulkInvoicesPage: React.FC = () => {
     setCompanies(newCompanies);
   };
 
-  // Create a company template from localStorage data
-  const createCompanyFromLocalStorage = (): CompanyTemplate => {
-    const COMPANY_STORAGE_KEY = 'invoiceArtisan_company';
-    
-    try {
-      // First try to load from the consolidated storage
-      const savedCompany = localStorage.getItem(COMPANY_STORAGE_KEY);
-      
-      if (savedCompany) {
-        const parsedCompany = JSON.parse(savedCompany);
-        return {
-          id: "your-company",
-          name: parsedCompany.name || 'Your Company',
-          address: parsedCompany.street || '',
-          city: parsedCompany.city || '',
-          postalCode: parsedCompany.zipCode || '',
-          country: parsedCompany.country || '',
-          phone: '',
-          email: parsedCompany.email || '',
-          taxId: '',
-          vatNumber: ''
-        };
-      }
-      
-      // Fallback to individual fields
-      return {
-        id: "your-company",
-        name: localStorage.getItem('company_name') || 'Your Company',
-        address: localStorage.getItem('company_street') || '',
-        city: localStorage.getItem('company_city') || '',
-        postalCode: localStorage.getItem('company_zipCode') || '',
-        country: localStorage.getItem('company_country') || '',
-        phone: '',
-        email: localStorage.getItem('company_email') || '',
-        taxId: '',
-        vatNumber: ''
-      };
-    } catch (error) {
-      console.error('Error creating company from localStorage:', error);
-      
-      // Return a default company if there's an error
-      return {
-        id: "your-company",
-        name: 'Your Company',
-        address: '',
-        city: '',
-        postalCode: '',
-        country: '',
-        phone: '',
-        email: '',
-        taxId: '',
-        vatNumber: ''
-      };
-    }
+  // Create a company template from company context data
+  const createCompanyFromContext = (): CompanyTemplate => {
+    return {
+      id: "your-company",
+      name: companyInfo.name || 'Your Company',
+      address: companyInfo.street || '',
+      city: companyInfo.city || '',
+      postalCode: companyInfo.zipCode || '',
+      country: companyInfo.country || '',
+      phone: '',
+      email: companyInfo.email || '',
+      taxId: '',
+      vatNumber: ''
+    };
   };
 
   const handleGenerateInvoices = () => {
@@ -119,8 +81,8 @@ const BulkInvoicesPage: React.FC = () => {
 
     let generatedCount = 0;
     
-    // Get your company info from localStorage
-    const yourCompany = createCompanyFromLocalStorage();
+    // Get your company info from the context instead of localStorage
+    const yourCompany = createCompanyFromContext();
 
     validCompanies.forEach((company) => {
       const amount = parseFloat(company.amount);
