@@ -261,7 +261,7 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
       totalAmount: subtotal,
       taxRate: values.taxRate,
       taxAmount: taxAmount,
-      status: initialData?.status || 'draft',
+      status: initialData?.status || 'paid', // Default to 'paid' instead of 'draft'
     };
   };
   

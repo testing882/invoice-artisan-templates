@@ -51,6 +51,62 @@ const BulkInvoicesPage: React.FC = () => {
     setCompanies(newCompanies);
   };
 
+  // Create a company template from localStorage data
+  const createCompanyFromLocalStorage = (): CompanyTemplate => {
+    const COMPANY_STORAGE_KEY = 'invoiceArtisan_company';
+    
+    try {
+      // First try to load from the consolidated storage
+      const savedCompany = localStorage.getItem(COMPANY_STORAGE_KEY);
+      
+      if (savedCompany) {
+        const parsedCompany = JSON.parse(savedCompany);
+        return {
+          id: "your-company",
+          name: parsedCompany.name || 'Your Company',
+          address: parsedCompany.street || '',
+          city: parsedCompany.city || '',
+          postalCode: parsedCompany.zipCode || '',
+          country: parsedCompany.country || '',
+          phone: '',
+          email: parsedCompany.email || '',
+          taxId: '',
+          vatNumber: ''
+        };
+      }
+      
+      // Fallback to individual fields
+      return {
+        id: "your-company",
+        name: localStorage.getItem('company_name') || 'Your Company',
+        address: localStorage.getItem('company_street') || '',
+        city: localStorage.getItem('company_city') || '',
+        postalCode: localStorage.getItem('company_zipCode') || '',
+        country: localStorage.getItem('company_country') || '',
+        phone: '',
+        email: localStorage.getItem('company_email') || '',
+        taxId: '',
+        vatNumber: ''
+      };
+    } catch (error) {
+      console.error('Error creating company from localStorage:', error);
+      
+      // Return a default company if there's an error
+      return {
+        id: "your-company",
+        name: 'Your Company',
+        address: '',
+        city: '',
+        postalCode: '',
+        country: '',
+        phone: '',
+        email: '',
+        taxId: '',
+        vatNumber: ''
+      };
+    }
+  };
+
   const handleGenerateInvoices = () => {
     const validCompanies = companies.filter(
       (company) => company.amount && !isNaN(parseFloat(company.amount)) && parseFloat(company.amount) > 0
@@ -62,6 +118,9 @@ const BulkInvoicesPage: React.FC = () => {
     }
 
     let generatedCount = 0;
+    
+    // Get your company info from localStorage
+    const yourCompany = createCompanyFromLocalStorage();
 
     validCompanies.forEach((company) => {
       const amount = parseFloat(company.amount);
@@ -79,17 +138,6 @@ const BulkInvoicesPage: React.FC = () => {
         amount: amount,
       };
 
-      const yourCompany: CompanyTemplate = {
-        id: "your-company",
-        name: localStorage.getItem('company_name') || 'Your Company',
-        address: localStorage.getItem('company_street') || '',
-        city: localStorage.getItem('company_city') || '',
-        postalCode: localStorage.getItem('company_zipCode') || '',
-        country: localStorage.getItem('company_country') || '',
-        phone: '',
-        email: localStorage.getItem('company_email') || '',
-      };
-
       const newInvoice: Invoice = {
         id: crypto.randomUUID(),
         invoiceNumber: generateInvoiceNumber(),
@@ -100,7 +148,7 @@ const BulkInvoicesPage: React.FC = () => {
         items: [invoiceItem],
         notes: '',
         totalAmount: amount,
-        status: 'draft',
+        status: 'paid', // Always set status to paid for all invoices
       };
 
       addInvoice(newInvoice);
@@ -126,7 +174,7 @@ const BulkInvoicesPage: React.FC = () => {
           dueDate={dueDate}
           setDueDate={setDueDate}
           description={globalDescription}
-          setDescription={setGlobalDescription}
+          setDescription={setDescription}
         />
 
         <CompanyAmountsTable 

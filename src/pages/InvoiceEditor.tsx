@@ -30,6 +30,9 @@ const InvoiceEditor: React.FC = () => {
   }, [templateId, getTemplateById]);
   
   const handleSubmit = (data: Invoice) => {
+    // Always ensure invoices are set to 'paid' status
+    data.status = 'paid';
+    
     if (isNewInvoice) {
       addInvoice(data);
     } else {

@@ -35,6 +35,8 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({ initialData, onSubmit, templa
   
   const handleSubmit = (values: any) => {
     const invoice = createInvoiceFromFormData(values);
+    // Set invoice status to "paid" by default
+    invoice.status = "paid";
     onSubmit(invoice);
   };
   

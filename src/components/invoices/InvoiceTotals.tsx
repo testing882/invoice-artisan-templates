@@ -31,7 +31,7 @@ const InvoiceTotals: React.FC<InvoiceTotalsProps> = ({
           </div>
         ) : null}
         
-        <div className="flex justify-between">
+        <div className="flex justify-between font-bold">
           <span>Amount Paid:</span>
           <span>{formatCurrency(grandTotal)}</span>
         </div>

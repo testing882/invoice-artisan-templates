@@ -17,7 +17,7 @@ const InvoicePartyInfo: React.FC<InvoicePartyInfoProps> = ({
     
     return (
       <div className="space-y-1">
-        <p className="font-bold text-lg">{company.name || ''}</p>
+        <p className="font-bold text-lg">{company.name || 'Your Company'}</p>
         {company.address && <p>{company.address}</p>}
         {company.city && (
           <p>
