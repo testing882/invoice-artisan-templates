@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
 import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
@@ -47,7 +48,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
           const rate = Number(item.rate) || 0;
           const newAmount = quantity * rate;
           
-          form.setValue(`items.${fieldIndex}.amount`, newAmount as any, { 
+          // Convert number to string when setting the form value
+          form.setValue(`items.${fieldIndex}.amount`, newAmount, { 
             shouldValidate: false 
           });
         }
@@ -116,7 +118,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               const quantity = parseFloat(e.target.value) || 0;
                               const rate = parseFloat(form.getValues(`items.${index}.rate`)) || 0;
                               const amount = quantity * rate;
-                              form.setValue(`items.${index}.amount`, amount as any);
+                              // Use the correct type or convert when setting the form value
+                              form.setValue(`items.${index}.amount`, amount);
                             }}
                           />
                         </FormControl>
@@ -142,7 +145,8 @@ const InvoiceItemsForm: React.FC<InvoiceItemsFormProps> = ({
                               const rate = parseFloat(e.target.value) || 0;
                               const quantity = parseFloat(form.getValues(`items.${index}.quantity`)) || 0;
                               const amount = quantity * rate;
-                              form.setValue(`items.${index}.amount`, amount as any);
+                              // Use the correct type or convert when setting the form value
+                              form.setValue(`items.${index}.amount`, amount);
                             }}
                           />
                         </FormControl>
