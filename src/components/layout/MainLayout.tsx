@@ -11,7 +11,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen flex">
       <Sidebar />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-6 ml-64 overflow-auto">
         <main className="max-w-7xl mx-auto">
           {children}
         </main>

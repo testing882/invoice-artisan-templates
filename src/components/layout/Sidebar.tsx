@@ -19,12 +19,12 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <div className="w-64 bg-sidebar border-r border-border h-screen flex flex-col">
+    <div className="fixed top-0 left-0 w-64 bg-sidebar border-r border-border h-screen flex flex-col">
       <div className="p-6">
         <h1 className="text-2xl font-bold text-invoice-blue">InvoiceArtisan</h1>
       </div>
       
-      <nav className="px-4 py-6 flex-1">
+      <nav className="px-4 py-6 flex-1 overflow-y-auto">
         <ul className="space-y-2">
           {navItems.map((item) => (
             <li key={item.name}>
