@@ -23,6 +23,7 @@ export type SupabaseTemplate = {
   vat_number: string | null;
   created_at: string;
   user_id: string;
+  currency: string | null; // Add currency field to match the database
 };
 
 // Convert snake_case from DB to camelCase for frontend
@@ -41,6 +42,7 @@ export const mapTemplateFromSupabase = (template: SupabaseTemplate): CompanyTemp
   notes: template.notes || '',
   isEU: template.is_eu || false,
   vatNumber: template.vat_number || '',
+  currency: template.currency || 'USD', // Map currency from DB, default to USD if not present
 });
 
 // Convert camelCase from frontend to snake_case for DB
@@ -59,6 +61,7 @@ export const mapTemplateToSupabase = (template: CompanyTemplate): Omit<SupabaseT
   is_eu: template.isEU,
   notes: template.notes || null,
   vat_number: template.vatNumber || null,
+  currency: template.currency || 'USD', // Ensure the currency is mapped to the database
 });
 
 // Get current user ID
