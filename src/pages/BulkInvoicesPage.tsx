@@ -65,7 +65,8 @@ const BulkInvoicesPage: React.FC = () => {
       phone: '',
       email: companyInfo.email || '',
       taxId: '',
-      vatNumber: ''
+      vatNumber: '',
+      currency: 'USD' // Add default currency
     };
   };
 

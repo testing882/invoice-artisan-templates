@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -69,7 +70,8 @@ const createCompanyFromLocalStorage = (): CompanyTemplate => {
         phone: '',
         email: parsedCompany.email || '',
         taxId: '',
-        vatNumber: ''
+        vatNumber: '',
+        currency: 'USD' // Add default currency
       };
     }
     
@@ -84,7 +86,8 @@ const createCompanyFromLocalStorage = (): CompanyTemplate => {
       phone: '',
       email: localStorage.getItem('company_email') || '',
       taxId: '',
-      vatNumber: ''
+      vatNumber: '',
+      currency: 'USD' // Add default currency
     };
   } catch (error) {
     console.error('Error creating company from localStorage:', error);
@@ -100,7 +103,8 @@ const createCompanyFromLocalStorage = (): CompanyTemplate => {
       phone: '',
       email: '',
       taxId: '',
-      vatNumber: ''
+      vatNumber: '',
+      currency: 'USD' // Add default currency
     };
   }
 };
