@@ -23,7 +23,7 @@ export type SupabaseTemplate = {
   vat_number: string | null;
   created_at: string;
   user_id: string;
-  currency: string | null; // Add currency field to match the database
+  currency: string | null; // Include currency field to match database
 };
 
 // Convert snake_case from DB to camelCase for frontend

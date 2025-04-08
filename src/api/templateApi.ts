@@ -60,10 +60,15 @@ export const addTemplateToDatabase = async (template: CompanyTemplate): Promise<
       return;
     }
     
+    // Ensure currency is set
+    if (!template.currency) {
+      template.currency = 'USD';
+    }
+    
     // Map template to Supabase format
     const supabaseTemplate = mapTemplateToSupabase(template);
     
-    console.log('Adding template to database:', supabaseTemplate);
+    console.log('Adding template to database with currency:', supabaseTemplate.currency);
     
     // Insert template into Supabase
     const { error } = await supabase
@@ -97,10 +102,15 @@ export const updateTemplateInDatabase = async (template: CompanyTemplate): Promi
       return;
     }
     
+    // Ensure currency is set
+    if (!template.currency) {
+      template.currency = 'USD';
+    }
+    
     // Map template to Supabase format
     const supabaseTemplate = mapTemplateToSupabase(template);
     
-    console.log('Updating template in database:', supabaseTemplate);
+    console.log('Updating template in database with currency:', supabaseTemplate.currency);
     
     // Update template in Supabase
     const { error } = await supabase

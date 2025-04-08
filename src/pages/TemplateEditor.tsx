@@ -16,10 +16,12 @@ const TemplateEditor: React.FC = () => {
   const template = !isNewTemplate ? getTemplateById(id!) : undefined;
   
   const handleSubmit = (data: CompanyTemplate) => {
-    // Ensure currency is set
+    // Ensure currency is set - this is crucial for saving to the database
     if (!data.currency) {
       data.currency = 'USD';
     }
+    
+    console.log('Submitting template with currency:', data.currency);
     
     if (isNewTemplate) {
       addTemplate(data);

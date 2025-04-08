@@ -42,8 +42,10 @@ export const generateInvoiceNumber = (): string => {
 
 export const exportToPdf = (invoice: Invoice): jsPDF => {
   const doc = new jsPDF();
-  // Make sure to get the currency from the invoice or use USD as fallback
-  const currency = invoice.currency || invoice.client.currency || 'USD';
+  // Make sure to get the currency from the invoice or company or client, with a fallback to USD
+  const currency = invoice.currency || invoice.company.currency || invoice.client.currency || 'USD';
+  
+  console.log('Using currency for PDF export:', currency);
   
   // Add invoice details
   doc.setFontSize(20);

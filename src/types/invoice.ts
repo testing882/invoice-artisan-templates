@@ -22,7 +22,7 @@ export interface CompanyTemplate {
   isEU?: boolean;
   notes?: string;
   vatNumber?: string;
-  currency?: string; // Add currency field
+  currency: string; // Make currency required, with string type
 }
 
 export interface ClientInfo {
@@ -59,5 +59,5 @@ export interface Invoice {
   status: 'draft' | 'sent' | 'paid';
   deleted?: boolean;
   deletedAt?: Date;
-  currency?: string; // Add currency field
+  currency?: string; // Keep currency field
 }
