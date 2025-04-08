@@ -22,6 +22,7 @@ export interface CompanyTemplate {
   isEU?: boolean;
   notes?: string;
   vatNumber?: string;
+  currency?: string; // Add currency field
 }
 
 export interface ClientInfo {
@@ -30,7 +31,8 @@ export interface ClientInfo {
   city: string;
   postalCode: string;
   country: string;
-  vatNumber?: string; // Add the vatNumber property
+  vatNumber?: string;
+  currency?: string; // Add currency field for client info
 }
 
 export interface CompanyInfo {
@@ -57,4 +59,5 @@ export interface Invoice {
   status: 'draft' | 'sent' | 'paid';
   deleted?: boolean;
   deletedAt?: Date;
+  currency?: string; // Add currency field
 }

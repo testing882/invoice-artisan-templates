@@ -16,6 +16,11 @@ const TemplateEditor: React.FC = () => {
   const template = !isNewTemplate ? getTemplateById(id!) : undefined;
   
   const handleSubmit = (data: CompanyTemplate) => {
+    // Ensure currency is set
+    if (!data.currency) {
+      data.currency = 'USD';
+    }
+    
     if (isNewTemplate) {
       addTemplate(data);
     } else {

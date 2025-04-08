@@ -16,6 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CompanyTemplate } from '@/types/invoice';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 const templateSchema = z.object({
   name: z.string().min(1, "Company name is required"),
@@ -31,6 +38,7 @@ const templateSchema = z.object({
   notes: z.string().optional().or(z.literal('')),
   isEU: z.boolean().default(false),
   vatNumber: z.string().optional().or(z.literal('')),
+  currency: z.string().default('USD'),
 });
 
 type TemplateFormValues = z.infer<typeof templateSchema>;
@@ -59,6 +67,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       notes: initialData.notes || '',
       isEU: initialData.isEU || false,
       vatNumber: initialData.vatNumber || '',
+      currency: initialData.currency || 'USD',
     } : {
       name: '',
       address: '',
@@ -73,6 +82,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       notes: '',
       isEU: false,
       vatNumber: '',
+      currency: 'USD',
     },
   });
 
@@ -97,6 +107,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
       notes: values.notes || '',
       isEU: values.isEU || false,
       vatNumber: values.vatNumber || '',
+      currency: values.currency,
     };
     
     console.log('Generated template:', template);
@@ -186,6 +197,31 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
                 <FormControl>
                   <Input placeholder="Service description" {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="currency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Currency</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select currency" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="USD">USD ($)</SelectItem>
+                    <SelectItem value="EUR">EUR (€)</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}

@@ -108,14 +108,17 @@ const BulkInvoicesPage: React.FC = () => {
         company: yourCompany,
         client: {
           ...company.template,
-          // Make sure to include VAT number from the template
-          vatNumber: company.template.vatNumber
+          // Make sure to include VAT number and currency from the template
+          vatNumber: company.template.vatNumber,
+          currency: company.template.currency || 'USD'
         } as ClientInfo,
         items: [invoiceItem],
         // Include notes from the template if they exist
         notes: company.template.notes || '',
         totalAmount: amount,
         status: 'paid', // Always set status to paid for all invoices
+        // Include the currency from the template
+        currency: company.template.currency || 'USD'
       };
 
       addInvoice(newInvoice);

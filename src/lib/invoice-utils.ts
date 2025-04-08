@@ -17,10 +17,17 @@ export const calculateTax = (subtotal: number, taxRate: number): number => {
   return subtotal * (taxRate / 100);
 };
 
-export const formatCurrency = (amount: number): string => {
+export const formatCurrency = (amount: number, currencyCode: string = 'USD'): string => {
+  const currencyConfig: Record<string, { code: string, symbol: string }> = {
+    USD: { code: 'USD', symbol: '$' },
+    EUR: { code: 'EUR', symbol: '€' }
+  };
+  
+  const currency = currencyConfig[currencyCode] || currencyConfig.USD;
+  
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: currency.code,
   }).format(amount);
 };
 
@@ -35,6 +42,7 @@ export const generateInvoiceNumber = (): string => {
 
 export const exportToPdf = (invoice: Invoice): jsPDF => {
   const doc = new jsPDF();
+  const currency = invoice.currency || 'USD';
   
   // Add invoice details
   doc.setFontSize(20);
@@ -143,8 +151,8 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   const tableRows = invoice.items.map(item => [
     item.description,
     item.quantity.toString(),
-    formatCurrency(item.rate),
-    formatCurrency(item.amount)
+    formatCurrency(item.rate, currency),
+    formatCurrency(item.amount, currency)
   ]);
   
   // Add invoice items table using autoTable directly
@@ -176,20 +184,20 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   
   // Subtotal
   doc.text(`Subtotal:`, labelX, finalY + 10);
-  doc.text(`${formatCurrency(invoice.totalAmount)}`, valueX, finalY + 10, { align: 'right' });
+  doc.text(`${formatCurrency(invoice.totalAmount, currency)}`, valueX, finalY + 10, { align: 'right' });
   
   // Tax if available
   let currentY = finalY + 10;
   if (invoice.taxRate && invoice.taxAmount) {
     currentY += 7;
     doc.text(`Tax (${invoice.taxRate}%):`, labelX, currentY);
-    doc.text(`${formatCurrency(invoice.taxAmount)}`, valueX, currentY, { align: 'right' });
+    doc.text(`${formatCurrency(invoice.taxAmount, currency)}`, valueX, currentY, { align: 'right' });
   }
   
   // Amount Paid (Total)
   currentY += 7;
   doc.text(`Amount Paid:`, labelX, currentY);
-  doc.text(`${formatCurrency(totalWithTax)}`, valueX, currentY, { align: 'right' });
+  doc.text(`${formatCurrency(totalWithTax, currency)}`, valueX, currentY, { align: 'right' });
   
   // Add notes
   if (invoice.notes) {
