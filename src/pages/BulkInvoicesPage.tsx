@@ -21,7 +21,8 @@ const BulkInvoicesPage: React.FC = () => {
   const [companies, setCompanies] = useState<{ 
     template: CompanyTemplate; 
     amount: string;
-    description: string; 
+    description: string;
+    currency: string; // Add currency field
   }[]>([]);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ const BulkInvoicesPage: React.FC = () => {
           template,
           amount: '',
           description: template.description || '',
+          currency: template.currency || 'USD', // Use template currency or default to USD
         }))
       );
     }
@@ -50,6 +52,12 @@ const BulkInvoicesPage: React.FC = () => {
   const handleDescriptionChange = (index: number, value: string) => {
     const newCompanies = [...companies];
     newCompanies[index].description = value;
+    setCompanies(newCompanies);
+  };
+
+  const handleCurrencyChange = (index: number, value: string) => {
+    const newCompanies = [...companies];
+    newCompanies[index].currency = value;
     setCompanies(newCompanies);
   };
 
@@ -111,15 +119,15 @@ const BulkInvoicesPage: React.FC = () => {
           ...company.template,
           // Make sure to include VAT number and currency from the template
           vatNumber: company.template.vatNumber,
-          currency: company.template.currency || 'USD'
+          currency: company.currency // Use the selected currency for this company
         } as ClientInfo,
         items: [invoiceItem],
         // Include notes from the template if they exist
         notes: company.template.notes || '',
         totalAmount: amount,
         status: 'paid', // Always set status to paid for all invoices
-        // Include the currency from the template
-        currency: company.template.currency || 'USD'
+        // Include the currency as selected for each company
+        currency: company.currency // Set the invoice currency to the selected currency
       };
 
       addInvoice(newInvoice);
@@ -152,6 +160,7 @@ const BulkInvoicesPage: React.FC = () => {
           companies={companies}
           onAmountChange={handleAmountChange}
           onDescriptionChange={handleDescriptionChange}
+          onCurrencyChange={handleCurrencyChange} // Add new handler for currency changes
           onGenerateInvoices={handleGenerateInvoices}
         />
       </div>
