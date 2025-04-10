@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -86,7 +85,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
     },
   });
 
-  // Watch the isEU field to conditionally show VAT input
   const isEU = form.watch('isEU');
 
   const handleSubmit = (values: TemplateFormValues) => {
@@ -220,6 +218,7 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
                   <SelectContent>
                     <SelectItem value="USD">USD ($)</SelectItem>
                     <SelectItem value="EUR">EUR (€)</SelectItem>
+                    <SelectItem value="GBP">GBP (£)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -228,7 +227,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
           />
         </div>
         
-        {/* Notes field - added for payment instructions */}
         <FormField
           control={form.control}
           name="notes"
@@ -265,7 +263,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ initialData, onSubmit }) =>
           )}
         />
         
-        {/* VAT Number field - only shown when isEU is checked */}
         {isEU && (
           <FormField
             control={form.control}

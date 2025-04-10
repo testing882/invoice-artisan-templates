@@ -6,7 +6,7 @@ interface InvoiceTotalsProps {
   totalAmount: number;
   taxRate?: number;
   taxAmount?: number;
-  currency?: string; // Add currency prop
+  currency?: string;
 }
 
 const InvoiceTotals: React.FC<InvoiceTotalsProps> = ({
