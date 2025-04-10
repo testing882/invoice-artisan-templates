@@ -74,7 +74,7 @@ const BulkInvoicesPage: React.FC = () => {
       email: companyInfo.email || '',
       taxId: '',
       vatNumber: '',
-      currency: 'USD' // Add default currency
+      currency: 'USD' // Default currency
     };
   };
 
@@ -90,7 +90,7 @@ const BulkInvoicesPage: React.FC = () => {
 
     let generatedCount = 0;
     
-    // Get your company info from the context instead of localStorage
+    // Get your company info from the context
     const yourCompany = createCompanyFromContext();
 
     validCompanies.forEach((company) => {
@@ -126,8 +126,8 @@ const BulkInvoicesPage: React.FC = () => {
         notes: company.template.notes || '',
         totalAmount: amount,
         status: 'paid', // Always set status to paid for all invoices
-        // Include the currency as selected for each company
-        currency: company.currency // Set the invoice currency to the selected currency
+        // Explicitly set the invoice currency to the selected currency
+        currency: company.currency // This ensures the PDF will use the correct currency
       };
 
       addInvoice(newInvoice);

@@ -1,4 +1,3 @@
-
 import { Invoice, InvoiceItem } from '@/types/invoice';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -20,7 +19,8 @@ export const calculateTax = (subtotal: number, taxRate: number): number => {
 export const formatCurrency = (amount: number, currencyCode: string = 'USD'): string => {
   const currencyConfig: Record<string, { code: string, symbol: string }> = {
     USD: { code: 'USD', symbol: '$' },
-    EUR: { code: 'EUR', symbol: '€' }
+    EUR: { code: 'EUR', symbol: '€' },
+    GBP: { code: 'GBP', symbol: '£' }
   };
   
   const currency = currencyConfig[currencyCode] || currencyConfig.USD;
@@ -42,12 +42,11 @@ export const generateInvoiceNumber = (): string => {
 
 export const exportToPdf = (invoice: Invoice): jsPDF => {
   const doc = new jsPDF();
-  // Make sure to get the currency from the invoice or company or client, with a fallback to USD
-  const currency = invoice.currency || invoice.company.currency || invoice.client.currency || 'USD';
+  
+  const currency = invoice.currency || invoice.company?.currency || invoice.client?.currency || 'USD';
   
   console.log('Using currency for PDF export:', currency);
   
-  // Add invoice details
   doc.setFontSize(20);
   doc.text('INVOICE', 14, 22);
   
@@ -56,25 +55,20 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
   doc.text(`Date: ${format(invoice.date, 'MMM dd, yyyy')}`, 14, 42);
   doc.text(`Due Date: ${format(invoice.dueDate, 'MMM dd, yyyy')}`, 14, 49);
   
-  // Company info - ensure all fields are correctly handled
   doc.setFontSize(12);
   doc.text('From:', 14, 66);
   doc.setFontSize(10);
   
-  // Always ensure company name is displayed
   const companyName = invoice.company?.name || 'Your Company';
   doc.text(companyName, 14, 73);
   
-  // Track current Y position
   let yPos = 80;
   
-  // Add address if it exists
   if (invoice.company?.address) {
     doc.text(invoice.company.address, 14, yPos);
     yPos += 7;
   }
   
-  // Handle city and postal code
   let cityPostalLine = '';
   if (invoice.company?.city) {
     cityPostalLine += invoice.company.city;
@@ -90,31 +84,26 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
     yPos += 7;
   }
   
-  // Add country if it exists
   if (invoice.company?.country) {
     doc.text(invoice.company.country, 14, yPos);
     yPos += 7;
   }
   
-  // Add email if it exists
   if (invoice.company?.email) {
     doc.text(invoice.company.email, 14, yPos);
     yPos += 7;
   }
   
-  // Add VAT number if it exists
   if (invoice.company?.vatNumber) {
     doc.text(`VAT: ${invoice.company.vatNumber}`, 14, yPos);
     yPos += 7;
   }
   
-  // Client info
   doc.setFontSize(12);
   doc.text('Bill To:', 120, 66);
   doc.setFontSize(10);
   doc.text(invoice.client.name || '', 120, 73);
   
-  // Reset Y position for client info
   yPos = 80;
   
   if (invoice.client.address) {
@@ -122,7 +111,6 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
     yPos += 7;
   }
   
-  // Handle city and postal code carefully for client
   let clientCityPostalLine = '';
   if (invoice.client.city) {
     clientCityPostalLine += invoice.client.city;
@@ -143,13 +131,11 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
     yPos += 7;
   }
   
-  // Add VAT number for client if it exists
   if (invoice.client.vatNumber) {
     doc.text(`VAT: ${invoice.client.vatNumber}`, 120, yPos);
     yPos += 7;
   }
   
-  // Invoice items
   const tableColumn = ["Description", "Qty", "Rate", "Amount"];
   const tableRows = invoice.items.map(item => [
     item.description,
@@ -158,7 +144,6 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
     formatCurrency(item.amount, currency)
   ]);
   
-  // Add invoice items table using autoTable directly
   autoTable(doc, {
     head: [tableColumn],
     body: tableRows,
@@ -175,21 +160,16 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
     },
   });
   
-  // Get the final Y position after the table
   const finalY = (doc as any).lastAutoTable.finalY || 110;
   
-  // Calculate total with tax if available
   const totalWithTax = invoice.taxAmount ? invoice.totalAmount + invoice.taxAmount : invoice.totalAmount;
   
-  // Add Subtotal, Tax (if applicable), and Amount Paid
-  const labelX = 120; // Starting position for the labels
-  const valueX = 170; // Position for the values (aligned right)
+  const labelX = 120;
+  const valueX = 170;
   
-  // Subtotal
   doc.text(`Subtotal:`, labelX, finalY + 10);
   doc.text(`${formatCurrency(invoice.totalAmount, currency)}`, valueX, finalY + 10, { align: 'right' });
   
-  // Tax if available
   let currentY = finalY + 10;
   if (invoice.taxRate && invoice.taxAmount) {
     currentY += 7;
@@ -197,12 +177,10 @@ export const exportToPdf = (invoice: Invoice): jsPDF => {
     doc.text(`${formatCurrency(invoice.taxAmount, currency)}`, valueX, currentY, { align: 'right' });
   }
   
-  // Amount Paid (Total)
   currentY += 7;
   doc.text(`Amount Paid:`, labelX, currentY);
   doc.text(`${formatCurrency(totalWithTax, currency)}`, valueX, currentY, { align: 'right' });
   
-  // Add notes
   if (invoice.notes) {
     doc.setFontSize(11);
     doc.text('Notes:', 14, finalY + 40);
@@ -228,26 +206,18 @@ export const exportInvoicesToZip = async (
   invoices: Invoice[],
   zipFilename: string
 ): Promise<void> => {
-  // Create a new JSZip instance
   const zip = new JSZip();
   
-  // Process each invoice
   for (const invoice of invoices) {
     try {
-      // Generate PDF document
       const pdfDoc = exportToPdf(invoice);
-      
-      // Get PDF as blob
       const pdfBlob = await getPdfAsBlob(pdfDoc);
-      
-      // Add PDF to zip
       zip.file(`Invoice-${invoice.invoiceNumber}.pdf`, pdfBlob);
     } catch (error) {
       console.error(`Error adding invoice ${invoice.invoiceNumber} to zip:`, error);
     }
   }
   
-  // Generate and download the zip file
   zip.generateAsync({ type: 'blob' }).then((blob) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -261,23 +231,18 @@ export const exportInvoicesToZip = async (
 };
 
 export const generateZipFilename = (invoices: Invoice[]): string => {
-  // Default name
   let filename = "Invoices";
   
   if (invoices.length > 0) {
-    // Get year and month from the first invoice
     const year = format(invoices[0].date, 'yyyy');
     const month = format(invoices[0].date, 'MMMM');
     
-    // Check if all invoices are for the same client
     const firstClientName = invoices[0].client.name;
     const allSameClient = invoices.every(invoice => invoice.client.name === firstClientName);
     
     if (allSameClient) {
-      // Format: YEAR_MONTH_CLIENTNAME_Invoices.zip
       filename = `${year}_${month}_${firstClientName}_Invoices`;
     } else {
-      // Format: YEAR_MONTH_Invoices.zip
       filename = `${year}_${month}_Invoices`;
     }
   }
