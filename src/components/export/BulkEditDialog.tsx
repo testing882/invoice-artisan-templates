@@ -116,12 +116,13 @@ const BulkEditDialog: React.FC<BulkEditDialogProps> = ({
                   {formData.date ? format(formData.date, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
                   selected={formData.date}
                   onSelect={handleDateChange}
                   initialFocus
+                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
@@ -144,12 +145,13 @@ const BulkEditDialog: React.FC<BulkEditDialogProps> = ({
                   {formData.dueDate ? format(formData.dueDate, "PPP") : "Pick a date"}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
+              <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="single"
                   selected={formData.dueDate}
                   onSelect={handleDueDateChange}
                   initialFocus
+                  className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
