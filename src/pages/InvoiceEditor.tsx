@@ -7,6 +7,7 @@ import InvoiceForm from '@/components/invoices/InvoiceForm';
 import { Invoice } from '@/types/invoice';
 import { toast } from 'sonner';
 import { useTemplates } from '@/context/TemplatesContext';
+import { generateInvoiceNumber } from '@/lib/invoice-utils';
 
 const InvoiceEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +33,11 @@ const InvoiceEditor: React.FC = () => {
   const handleSubmit = (data: Invoice) => {
     // Always ensure invoices are set to 'paid' status
     data.status = 'paid';
+    
+    // For new invoices, ensure the invoice number is properly set using our generator
+    if (isNewInvoice && (!data.invoiceNumber || data.invoiceNumber.startsWith('INV-20'))) {
+      data.invoiceNumber = generateInvoiceNumber();
+    }
     
     if (isNewInvoice) {
       addInvoice(data);

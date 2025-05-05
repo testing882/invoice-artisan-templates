@@ -31,13 +31,25 @@ export const formatCurrency = (amount: number, currencyCode: string = 'USD'): st
   }).format(amount);
 };
 
+// Get the next invoice number from localStorage
+const getNextInvoiceNumber = (): number => {
+  const INVOICE_COUNTER_KEY = 'invoiceArtisan_invoiceCounter';
+  // Get the current counter value or start at 100 if not set
+  let counter = parseInt(localStorage.getItem(INVOICE_COUNTER_KEY) || '100', 10);
+  
+  // Increment the counter
+  counter += 1;
+  
+  // Store the new counter value
+  localStorage.setItem(INVOICE_COUNTER_KEY, counter.toString());
+  
+  return counter;
+};
+
+// Generate a chronological invoice number
 export const generateInvoiceNumber = (): string => {
-  const prefix = 'INV';
-  const random = Math.floor(Math.random() * 10000)
-    .toString()
-    .padStart(4, '0');
-  const date = format(new Date(), 'yyyyMMdd');
-  return `${prefix}-${date}-${random}`;
+  const counter = getNextInvoiceNumber();
+  return `INV-${counter}`;
 };
 
 export const exportToPdf = (invoice: Invoice): jsPDF => {

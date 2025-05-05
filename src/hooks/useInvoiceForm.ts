@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -132,7 +131,7 @@ export const useInvoiceForm = ({ initialData, templates, templateId }: UseInvoic
     notes: initialData.notes || '',
     taxRate: initialData.taxRate || 0,
   } : {
-    invoiceNumber: generateInvoiceNumber(),
+    invoiceNumber: generateInvoiceNumber(), // Use the updated invoice number generator
     date: new Date(),
     dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
     companyId: selectedTemplate?.id || "your-company",
